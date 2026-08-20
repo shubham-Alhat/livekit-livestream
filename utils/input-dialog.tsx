@@ -7,6 +7,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -21,7 +22,10 @@ export function InputFieldgroup() {
       return;
     }
 
-    router.push(`/live/${username}`);
+    // create a unique string for userId
+    const userId = crypto.randomUUID();
+
+    router.push(`/live/${username}?userId=${userId}`);
   };
 
   return (
