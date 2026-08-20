@@ -13,19 +13,20 @@ import { useState } from "react";
 
 export function InputFieldgroup() {
   const [username, setUsername] = useState("");
+  const [role, setRole] = useState("buyer");
 
   const router = useRouter();
 
   const handleSubmit = () => {
-    if (username.trim() === "") {
-      alert("Please enter a unique name!");
+    if (username.trim() === "" || role.trim() === "") {
+      alert("Empty fields not allowed!");
       return;
     }
 
     // create a unique string for userId
     const userId = crypto.randomUUID();
 
-    router.push(`/live/${username}?userId=${userId}`);
+    router.push(`/live/${username}?userId=${userId}&role=${role}`);
   };
 
   return (
@@ -36,6 +37,15 @@ export function InputFieldgroup() {
           id="fieldgroup-name"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          placeholder="Jordan Lee"
+        />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="fieldgroup-name">Seller | Buyer</FieldLabel>
+        <Input
+          id="fieldgroup-name"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
           placeholder="Jordan Lee"
         />
       </Field>
