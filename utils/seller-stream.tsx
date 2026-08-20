@@ -9,6 +9,10 @@ export const SellerView = ({ roomId }: { roomId: string }) => {
 
   const handleGoLive = async () => {
     const res = await fetch(`/api/livekit/token?room=${roomId}&role=seller`);
+
+    const { token } = await res.json();
+    console.log("livekit token : ", token);
+    setToken(token);
   };
 
   return (
