@@ -1,7 +1,12 @@
 import { LivestreamCard } from "@/components/live-stream-card";
+import { LoginForm } from "@/components/login-page";
 import { Navbar } from "@/components/navbar";
+import { getSession } from "@/lib/dal";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const res = await getSession();
+
   return (
     <>
       <div className="min-h-screen bg-background">
@@ -25,6 +30,14 @@ export default function Home() {
             </div>
           </main>
         </div>
+        {/* login pop up */}
+        {!res && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="w-full max-w-md mx-4">
+              <LoginForm />
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
