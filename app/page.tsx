@@ -2,7 +2,6 @@ import { LivestreamCard } from "@/components/live-stream-card";
 import { LoginForm } from "@/components/login-page";
 import { Navbar } from "@/components/navbar";
 import { getSession } from "@/lib/dal";
-import { redirect } from "next/navigation";
 
 export default async function Home() {
   const res = await getSession();
