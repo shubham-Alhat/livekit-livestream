@@ -21,7 +21,7 @@ export default function DashboardPage() {
       body: JSON.stringify({ streamDescription: description }),
     });
 
-    console.log(res);
+    console.log(await res.json());
   };
 
   return (
