@@ -25,6 +25,7 @@ model User {
 enum STATUS {
   LIVE
   ENDED
+  SCHEDULED
 }
 
 model Show {
@@ -32,7 +33,7 @@ model Show {
   showName String
   streamerId String
   streamer User @relation(fields: [streamerId],references: [id])
-  status STATUS @default(LIVE)
+  status STATUS @default(SCHEDULED)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

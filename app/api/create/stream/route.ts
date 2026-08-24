@@ -1,23 +1,73 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { redirect } from "next/navigation";
+import { SessionPayload } from "@/lib/dal";
+import prisma from "@/lib/prisma";
+
+interface Body {
+  streamDescription: string;
+}
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  let body: Body;
+  try {
+    body = (await request.json()) as Body;
+  } catch {
+    return NextResponse.json(
+      { success: false, message: "Invalid JSON body" },
+      { status: 400 },
+    );
+  }
+
   const cookieStore = await cookies();
   const token = cookieStore.get("accessToken")?.value;
 
   if (!token) {
-    redirect("/login");
+    return NextResponse.json(
+      { success: false, message: "No token found", redirectToLogin: true },
+      { status: 401 },
+    );
+  }
+
+  let verifiedToken: SessionPayload;
+  try {
+    verifiedToken = jwt.verify(
+      token,
+      process.env.JWT_SECRET!,
+    ) as SessionPayload;
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Incorrect or malformed token",
+        redirectToLogin: true,
+      },
+      { status: 401 },
+    );
+  }
+
+  if (!body.streamDescription?.trim()) {
+    return NextResponse.json(
+      { success: false, message: "Stream description not found" },
+      { status: 400 },
+    );
   }
 
   try {
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET!);
-  } catch (error) {}
-
-  console.log(token);
-
-  console.log("body:", body);
-  return NextResponse.json({ body, message: "Hellow world" });
+    const newShow = await prisma.show.create({
+      data: {
+        showName: body.streamDescription.trim(),
+        streamerId: verifiedToken.userId,
+        status: "SCHEDULED",
+      },
+    });
+    return NextResponse.json({ success: true, streamId: newShow.id });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      { success: false, message: "Failed to create stream" },
+      { status: 500 },
+    );
+  }
 }
