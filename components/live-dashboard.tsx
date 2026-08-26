@@ -1,10 +1,16 @@
 "use client";
-import { PreJoin } from "@livekit/components-react";
-export default function LiveDashboardPage({ showId }: { showId: string }) {
+export default function LiveDashboardPage({
+  showId,
+  isMobile,
+  liveShowStatus,
+}: {
+  showId: string;
+  liveShowStatus: "LIVE" | "SCHEDULED";
+  isMobile: boolean;
+}) {
   return (
     <>
       <div>live dashboard page : {showId}</div>
-      <PreJoin />
     </>
   );
 }
