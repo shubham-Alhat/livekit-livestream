@@ -1,8 +1,8 @@
-import LiveDashboardPage from "@/components/live-dashboard";
+import PreviewStage from "@/components/preview-stage";
 import { getSession } from "@/lib/dal";
 import prisma from "@/lib/prisma";
-import { notFound, redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { notFound, redirect } from "next/navigation";
 
 export default async function page({
   params,
@@ -35,7 +35,7 @@ export default async function page({
 
   return (
     <>
-      <LiveDashboardPage
+      <PreviewStage
         showId={id}
         isMobile={isMobile}
         liveShowStatus={liveShow.status}
