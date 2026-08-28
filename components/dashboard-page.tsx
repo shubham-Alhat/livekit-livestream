@@ -42,7 +42,7 @@ export default function DashboardPage() {
         return;
       }
 
-      router.push(`/dashboard/preview/${data.streamId}`);
+      router.push(`/dashboard/live/${data.streamId}`);
     } catch (error) {
       console.error(error);
       toast.error("Network error, please try again");

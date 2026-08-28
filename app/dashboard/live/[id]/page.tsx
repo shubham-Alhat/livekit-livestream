@@ -28,6 +28,8 @@ export default async function page({
 
   if (liveShow.status === "ENDED") redirect(`/dashboard/live/${id}/ended`);
 
+  const isPreviewStage = liveShow.status === "SCHEDULED";
+
   // checking if user is on Phone OR Laptop
   const headersList = await headers();
   const userAgent = headersList.get("user-agent") || "";
@@ -39,6 +41,7 @@ export default async function page({
         showId={id}
         isMobile={isMobile}
         liveShowStatus={liveShow.status}
+        isPreviewStage={isPreviewStage}
       />
     </>
   );
