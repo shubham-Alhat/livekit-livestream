@@ -155,8 +155,7 @@ export default function LiveDashboardPage({
           return;
         }
 
-        streamRef.current = initialStream;
-        if (videoRef.current) videoRef.current.srcObject = initialStream;
+        attachStream(initialStream);
 
         console.log(
           "Active stream tracks:",
