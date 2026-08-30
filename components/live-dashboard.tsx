@@ -121,29 +121,6 @@ export default function LiveDashboardPage({
     }
   };
 
-  // getConstraints function
-  const getConstraints = useCallback(
-    ({ videoId, audioId, facing, relaxed }: StreamOptions = {}) => {
-      const video = isMobile
-        ? { facingMode: relaxed ? facing : { ideal: facing } }
-        : videoId
-          ? { deviceId: relaxed ? videoId : { exact: videoId } }
-          : true;
-
-      const audio = isMobile
-        ? true
-        : audioId
-          ? { deviceId: relaxed ? audioId : { exact: audioId } }
-          : true;
-
-      console.log("video constraints:", video);
-      console.log("audio constraints:", audio);
-
-      return { video, audio };
-    },
-    [isMobile],
-  );
-
   // enumerate devices
   const enumerate = useCallback(async () => {
     console.log("enumerate devices function get called..", Date.now());
@@ -156,95 +133,54 @@ export default function LiveDashboardPage({
   }, []);
 
   // startStream function
-  const startStream = useCallback(
-    async (opts: StreamOptions) => {
-      setIsSwitching(true);
-      setErrorMessage("");
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia(
-          getConstraints(opts),
-        );
-        attachStream(stream);
-        setPermissionState(STATE.READY);
-      } catch (err: any) {
-        if (err.name === "OverconstrainedError") {
-          try {
-            const stream = await navigator.mediaDevices.getUserMedia(
-              getConstraints({ ...opts, relaxed: true }),
-            );
-            attachStream(stream);
-            setPermissionState(STATE.READY);
-            return;
-          } catch (retryErr: any) {
-            handleGetUserMediaError(retryErr);
-            return;
-          }
-        }
-        handleGetUserMediaError(err);
-      } finally {
-        setIsSwitching(false);
-      }
-    },
-    [attachStream, getConstraints],
-  );
 
-  // initial permission unlock + first preview
+  // initial camera & audio access and listing devices options
   useEffect(() => {
-    let cancelled = false;
+    let ignore = false;
 
     async function init() {
-      setPermissionState(STATE.REQUESTING);
       try {
-        console.log("starting camera..", Date.now());
-        const unlockStream = await navigator.mediaDevices.getUserMedia({
+        setPermissionState(STATE.REQUESTING);
+        const initialStream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: true,
         });
-        stopStream(unlockStream);
-        if (cancelled) return;
 
-        console.log("enumerating devices..", Date.now());
-        const { cams, mics } = await enumerate();
-        if (cancelled) return;
-
-        if (cams.length === 0) {
-          setPermissionState(STATE.NO_DEVICE);
-          setErrorMessage("No camera found on this device.");
+        if (ignore) {
+          initialStream.getTracks().forEach((t) => t.stop());
+          console.log(
+            "Discarded stale stream:",
+            initialStream.getTracks().map((t) => t.id),
+          );
           return;
         }
-        console.log("cams : ", cams);
-        console.log("mics : ", mics);
-        const defaultVideoId = cams[0].deviceId;
-        const defaultAudioId = mics[0]?.deviceId ?? "";
-        setSelectedVideoId(defaultVideoId);
-        setSelectedAudioId(defaultAudioId);
 
-        await startStream({
-          videoId: defaultVideoId,
-          audioId: defaultAudioId,
-          facing: facingMode,
-        });
-      } catch (err: any) {
-        if (!cancelled) handleGetUserMediaError(err);
+        streamRef.current = initialStream;
+        if (videoRef.current) videoRef.current.srcObject = initialStream;
+
+        console.log(
+          "Active stream tracks:",
+          initialStream.getTracks().map((t) => `${t.kind}:${t.id}`),
+        );
+        setPermissionState(STATE.READY);
+      } catch (error) {
+        console.log(error);
+        if (!ignore) handleGetUserMediaError(error);
       }
     }
-
     init();
 
-    const onDeviceChange = () => enumerate();
-    navigator.mediaDevices.addEventListener("devicechange", onDeviceChange);
-
     return () => {
-      console.log("return cleanup called", Date.now());
-      cancelled = true;
-      navigator.mediaDevices.removeEventListener(
-        "devicechange",
-        onDeviceChange,
-      );
-      stopStream(streamRef.current);
-      streamRef.current = null;
+      ignore = true;
+      console.log("cleanup: unmounting, stopping camera");
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => {
+          t.stop();
+          console.log(`Stopped track: ${t.kind} (${t.label})`);
+        });
+        streamRef.current = null;
+      }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
