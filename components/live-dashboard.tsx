@@ -116,6 +116,7 @@ export default function LiveDashboardPage({
 
   // enumerate devices
   const enumerate = useCallback(async () => {
+    console.log("enumerate devices function get called..", Date.now());
     const all = await navigator.mediaDevices.enumerateDevices();
     const cams = all.filter((d) => d.kind === "videoinput");
     const mics = all.filter((d) => d.kind === "audioinput");
@@ -131,6 +132,7 @@ export default function LiveDashboardPage({
     async function init() {
       setPermissionState(STATE.REQUESTING);
       try {
+        console.log("starting camera..", Date.now());
         const unlockStream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: true,
@@ -138,6 +140,7 @@ export default function LiveDashboardPage({
         stopStream(unlockStream);
         if (cancelled) return;
 
+        console.log("enumerating devices..", Date.now());
         const { cams, mics } = await enumerate();
         if (cancelled) return;
 
@@ -169,6 +172,7 @@ export default function LiveDashboardPage({
     navigator.mediaDevices.addEventListener("devicechange", onDeviceChange);
 
     return () => {
+      console.log("return cleanup called", Date.now());
       cancelled = true;
       navigator.mediaDevices.removeEventListener(
         "devicechange",
@@ -203,21 +207,21 @@ export default function LiveDashboardPage({
               className="h-full w-full object-cover"
             />
 
-            {/* {permissionState === STATE.REQUESTING && (
-            <Overlay text="Requesting camera access…" />
-          )}
-          {isSwitching && permissionState === STATE.READY && (
-            <Overlay text="Switching device…" subtle />
-          )}
-          {permissionState === STATE.DENIED && (
-            <Overlay text={errorMessage} tone="error" />
-          )}
-          {permissionState === STATE.NO_DEVICE && (
-            <Overlay text={errorMessage} tone="error" />
-          )}
-          {permissionState === STATE.ERROR && (
-            <Overlay text={errorMessage} tone="error" />
-          )} */}
+            {permissionState === STATE.REQUESTING && (
+              <Overlay text="Requesting camera access…" />
+            )}
+            {isSwitching && permissionState === STATE.READY && (
+              <Overlay text="Switching device…" subtle />
+            )}
+            {permissionState === STATE.DENIED && (
+              <Overlay text={errorMessage} tone="error" />
+            )}
+            {permissionState === STATE.NO_DEVICE && (
+              <Overlay text={errorMessage} tone="error" />
+            )}
+            {permissionState === STATE.ERROR && (
+              <Overlay text={errorMessage} tone="error" />
+            )}
             {isMobile && (
               <Button
                 // onClick={flipCamera}
@@ -232,7 +236,10 @@ export default function LiveDashboardPage({
           <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
             <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-300">
               Camera
-              <select className="rounded-md bg-zinc-900 border border-zinc-700 px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select
+                value={selectedVideoId}
+                className="rounded-md bg-zinc-900 border border-zinc-700 px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
                 {videoDevices.map((d) => (
                   <option key={d.deviceId} value={d.deviceId}>
                     {d.label || `Camera ${d.deviceId.slice(0, 6)}`}
@@ -244,7 +251,7 @@ export default function LiveDashboardPage({
             <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-300">
               Microphone
               <select
-                // value={selectedAudioId}
+                value={selectedAudioId}
                 // onChange={onSelectAudio}
                 className="rounded-md bg-zinc-900 border border-zinc-700 px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
