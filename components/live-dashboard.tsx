@@ -14,6 +14,13 @@ const STATE = {
 
 type PermissionState = (typeof STATE)[keyof typeof STATE];
 
+interface StreamOptions {
+  videoId?: string;
+  audioId?: string;
+  facing?: string;
+  relaxed?: boolean;
+}
+
 function Overlay({
   text,
   tone = "default",
@@ -114,6 +121,29 @@ export default function LiveDashboardPage({
     }
   };
 
+  // getConstraints function
+  const getConstraints = useCallback(
+    ({ videoId, audioId, facing, relaxed }: StreamOptions = {}) => {
+      const video = isMobile
+        ? { facingMode: relaxed ? facing : { ideal: facing } }
+        : videoId
+          ? { deviceId: relaxed ? videoId : { exact: videoId } }
+          : true;
+
+      const audio = isMobile
+        ? true
+        : audioId
+          ? { deviceId: relaxed ? audioId : { exact: audioId } }
+          : true;
+
+      console.log("video constraints:", video);
+      console.log("audio constraints:", audio);
+
+      return { video, audio };
+    },
+    [isMobile],
+  );
+
   // enumerate devices
   const enumerate = useCallback(async () => {
     console.log("enumerate devices function get called..", Date.now());
@@ -124,6 +154,39 @@ export default function LiveDashboardPage({
     setAudioDevices(mics);
     return { cams, mics };
   }, []);
+
+  // startStream function
+  const startStream = useCallback(
+    async (opts: StreamOptions) => {
+      setIsSwitching(true);
+      setErrorMessage("");
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(
+          getConstraints(opts),
+        );
+        attachStream(stream);
+        setPermissionState(STATE.READY);
+      } catch (err: any) {
+        if (err.name === "OverconstrainedError") {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia(
+              getConstraints({ ...opts, relaxed: true }),
+            );
+            attachStream(stream);
+            setPermissionState(STATE.READY);
+            return;
+          } catch (retryErr: any) {
+            handleGetUserMediaError(retryErr);
+            return;
+          }
+        }
+        handleGetUserMediaError(err);
+      } finally {
+        setIsSwitching(false);
+      }
+    },
+    [attachStream, getConstraints],
+  );
 
   // initial permission unlock + first preview
   useEffect(() => {
@@ -156,11 +219,11 @@ export default function LiveDashboardPage({
         setSelectedVideoId(defaultVideoId);
         setSelectedAudioId(defaultAudioId);
 
-        // await startStream({
-        //   videoId: defaultVideoId,
-        //   audioId: defaultAudioId,
-        //   facing: facingMode,
-        // });
+        await startStream({
+          videoId: defaultVideoId,
+          audioId: defaultAudioId,
+          facing: facingMode,
+        });
       } catch (err: any) {
         if (!cancelled) handleGetUserMediaError(err);
       }

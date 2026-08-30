@@ -35,6 +35,8 @@ export default async function page({
   const userAgent = headersList.get("user-agent") || "";
   const isMobile = /iPhone|iPad|Android/i.test(userAgent);
 
+  console.log(userAgent);
+
   return (
     <>
       <LiveDashboardPage
