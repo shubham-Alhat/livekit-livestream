@@ -2,50 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
-
-const STATE = {
-  IDLE: "idle",
-  REQUESTING: "requesting",
-  DENIED: "denied",
-  NO_DEVICE: "no_device",
-  READY: "ready",
-  ERROR: "error",
-} as const;
-
-type PermissionState = (typeof STATE)[keyof typeof STATE];
-
-interface StreamOptions {
-  videoId?: string;
-  audioId?: string;
-  facing?: string;
-  relaxed?: boolean;
-}
-
-function Overlay({
-  text,
-  tone = "default",
-  subtle = false,
-}: {
-  text: string;
-  tone?: "default" | "error";
-  subtle?: boolean;
-}) {
-  return (
-    <div
-      className={`absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-10 transition-opacity ${
-        subtle ? "opacity-75" : "opacity-100"
-      }`}
-    >
-      <p
-        className={`text-sm font-medium px-4 text-center ${
-          tone === "error" ? "text-red-400" : "text-white"
-        }`}
-      >
-        {text}
-      </p>
-    </div>
-  );
-}
+import { Overlay, STATE, PermissionState } from "./overlay";
+import { StreamOptions } from "./overlay";
 
 export default function LiveDashboardPage({
   showId,
@@ -132,6 +90,28 @@ export default function LiveDashboardPage({
     return { cams, mics };
   }, []);
 
+  const onDeviceChange = useCallback(async () => {
+    console.log("onDeviceChange fires now:", Date.now());
+    await enumerate();
+  }, []);
+
+  const onSelectVideo = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    console.log(id);
+    setSelectedVideoId(id);
+    stopStream(streamRef.current);
+    try {
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: id } },
+        audio: true,
+      });
+
+      attachStream(newStream);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // startStream function
 
   // initial camera & audio access and listing devices options
@@ -162,6 +142,9 @@ export default function LiveDashboardPage({
           initialStream.getTracks().map((t) => `${t.kind}:${t.id}`),
         );
         setPermissionState(STATE.READY);
+
+        // emurateDevice Only for laptop/pc
+        if (!isMobile) await enumerate();
       } catch (error) {
         console.log(error);
         if (!ignore) handleGetUserMediaError(error);
@@ -169,8 +152,13 @@ export default function LiveDashboardPage({
     }
     init();
 
+    navigator.mediaDevices.addEventListener("devicechange", onDeviceChange);
     return () => {
       ignore = true;
+      navigator.mediaDevices.removeEventListener(
+        "devicechange",
+        onDeviceChange,
+      );
       console.log("cleanup: unmounting, stopping camera");
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((t) => {
@@ -231,36 +219,39 @@ export default function LiveDashboardPage({
             )}
           </div>
           {/* select options for audio and video */}
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-            <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-300">
-              Camera
-              <select
-                value={selectedVideoId}
-                className="rounded-md bg-zinc-900 border border-zinc-700 px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {videoDevices.map((d) => (
-                  <option key={d.deviceId} value={d.deviceId}>
-                    {d.label || `Camera ${d.deviceId.slice(0, 6)}`}
-                  </option>
-                ))}
-              </select>
-            </label>
+          {!isMobile && (
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-300">
+                Camera
+                <select
+                  onChange={onSelectVideo}
+                  value={selectedVideoId}
+                  className="rounded-md bg-zinc-900 border border-zinc-700 px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {videoDevices.map((d) => (
+                    <option key={d.deviceId} value={d.deviceId}>
+                      {d.label || `Camera ${d.deviceId.slice(0, 6)}`}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-            <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-300">
-              Microphone
-              <select
-                value={selectedAudioId}
-                // onChange={onSelectAudio}
-                className="rounded-md bg-zinc-900 border border-zinc-700 px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {audioDevices.map((d) => (
-                  <option key={d.deviceId} value={d.deviceId}>
-                    {d.label || `Mic ${d.deviceId.slice(0, 6)}`}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-300">
+                Microphone
+                <select
+                  value={selectedAudioId}
+                  // onChange={onSelectAudio}
+                  className="rounded-md bg-zinc-900 border border-zinc-700 px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {audioDevices.map((d) => (
+                    <option key={d.deviceId} value={d.deviceId}>
+                      {d.label || `Mic ${d.deviceId.slice(0, 6)}`}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )}
           <div className="w-full flex justify-center items-center mt-2.5">
             <Button className="cursor-pointer" type="button">
               Go Live
