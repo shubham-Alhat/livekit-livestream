@@ -1,5 +1,7 @@
 # Livekit livestream app
 
+understanding preview/go live flow and handling alledge cases with livekit sdk
+
 ### Understand livekit and how to implement it in app
 
 The three possible ways the seller will stream -
