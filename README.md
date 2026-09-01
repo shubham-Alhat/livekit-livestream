@@ -1,6 +1,6 @@
 # Livekit livestream app
 
-understanding preview/go live flow and handling alledge cases with livekit sdk
+understanding preview/go live flow and handling all edge cases with livekit sdk
 
 ### Understand livekit and how to implement it in app
 

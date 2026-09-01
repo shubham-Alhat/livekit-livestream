@@ -90,11 +90,6 @@ export default function LiveDashboardPage({
     return { cams, mics };
   }, []);
 
-  const onDeviceChange = useCallback(async () => {
-    console.log("onDeviceChange fires now:", Date.now());
-    await enumerate();
-  }, []);
-
   const onSelectVideo = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = e.target.value;
     console.log(id);
