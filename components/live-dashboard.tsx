@@ -50,7 +50,6 @@ export default function LiveDashboardPage({
     }
   }, []);
 
-  // Properly typed the error object
   const handleGetUserMediaError = (err: any) => {
     if (err.name === "NotAllowedError" || err.name === "SecurityError") {
       setPermissionState(STATE.DENIED);
@@ -98,16 +97,37 @@ export default function LiveDashboardPage({
     try {
       const newStream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: { exact: id } },
-        audio: true,
+        audio: selectedAudioId
+          ? { deviceId: { exact: selectedAudioId } }
+          : true,
       });
 
       attachStream(newStream);
     } catch (error) {
       console.log(error);
+      handleGetUserMediaError(error);
     }
   };
 
-  // startStream function
+  const onSelectAudio = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    console.log(id);
+    setSelectedAudioId(id);
+    stopStream(streamRef.current);
+    try {
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: selectedVideoId
+          ? { deviceId: { exact: selectedVideoId } }
+          : true,
+        audio: { deviceId: { exact: id } },
+      });
+
+      attachStream(newStream);
+    } catch (error) {
+      console.log(error);
+      handleGetUserMediaError(error);
+    }
+  };
 
   // initial camera & audio access and listing devices options
   useEffect(() => {
@@ -147,13 +167,9 @@ export default function LiveDashboardPage({
     }
     init();
 
-    navigator.mediaDevices.addEventListener("devicechange", onDeviceChange);
     return () => {
       ignore = true;
-      navigator.mediaDevices.removeEventListener(
-        "devicechange",
-        onDeviceChange,
-      );
+
       console.log("cleanup: unmounting, stopping camera");
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((t) => {
@@ -235,7 +251,7 @@ export default function LiveDashboardPage({
                 Microphone
                 <select
                   value={selectedAudioId}
-                  // onChange={onSelectAudio}
+                  onChange={onSelectAudio}
                   className="rounded-md bg-zinc-900 border border-zinc-700 px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {audioDevices.map((d) => (
