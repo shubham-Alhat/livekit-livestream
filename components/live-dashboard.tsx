@@ -223,7 +223,7 @@ export default function LiveDashboardPage({
               <Button
                 // onClick={flipCamera}
                 // disabled={isFlipping}
-                className="absolute bottom-3 right-3 rounded-full bg-black/60 backdrop-blur px-4 py-2 text-sm font-medium text-white disabled:opacity-50 transition-opacity hover:bg-black/80"
+                className="absolute bottom-3 right-3 rounded-full bg-black/60 backdrop-blur px-4 py-2 text-sm font-medium text-white disabled:opacity-50 transition-opacity hover:bg-black/80 cursor-pointer"
               >
                 {false ? "Flipping…" : "Flip camera"}
               </Button>
