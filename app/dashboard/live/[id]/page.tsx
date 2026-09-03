@@ -3,6 +3,7 @@ import { getSession } from "@/lib/dal";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { headers } from "next/headers";
+import PreviewStage from "@/components/preview-stage";
 
 export default async function page({
   params,
@@ -36,6 +37,18 @@ export default async function page({
   const isMobile = /iPhone|iPad|Android/i.test(userAgent);
 
   console.log(userAgent);
+
+  if (isPreviewStage) {
+    return (
+      <>
+        <PreviewStage
+          showId={id}
+          isMobile={isMobile}
+          liveShowStatus={liveShow.status}
+        />
+      </>
+    );
+  }
 
   return (
     <>
