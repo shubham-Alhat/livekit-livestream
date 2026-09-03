@@ -3,16 +3,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Overlay, STATE, PermissionState } from "./overlay";
-import { StreamOptions } from "./overlay";
 
 export default function PreviewStage({
   showId,
   isMobile,
-  liveShowStatus,
+  onGoLive,
 }: {
   showId: string;
-  liveShowStatus: "LIVE" | "SCHEDULED";
   isMobile: boolean;
+  onGoLive: () => Promise<void>;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -101,7 +100,10 @@ export default function PreviewStage({
       });
 
       attachStream(newStream);
-      localStorage.setItem("videoId", JSON.stringify(id));
+      localStorage.setItem(
+        "videoDeviceId",
+        JSON.stringify({ showId: showId, deviceId: id }),
+      );
     } catch (error) {
       console.log(error);
       handleGetUserMediaError(error);
@@ -122,7 +124,10 @@ export default function PreviewStage({
       });
 
       attachStream(newStream);
-      localStorage.setItem("audioId", JSON.stringify(id));
+      localStorage.setItem(
+        "audioDeviceId",
+        JSON.stringify({ showId: showId, deviceId: id }),
+      );
     } catch (error) {
       console.log(error);
       handleGetUserMediaError(error);
@@ -178,10 +183,17 @@ export default function PreviewStage({
         });
         streamRef.current = null;
       }
-
-      // clean the localstorage
     };
   }, []);
+
+  const handleGoLiveClick = async () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+
+    await onGoLive();
+  };
 
   return (
     <>
@@ -263,7 +275,11 @@ export default function PreviewStage({
             </div>
           )}
           <div className="w-full flex justify-center items-center mt-2.5">
-            <Button className="cursor-pointer" type="button">
+            <Button
+              onClick={handleGoLiveClick}
+              className="cursor-pointer"
+              type="button"
+            >
               Go Live
             </Button>
           </div>

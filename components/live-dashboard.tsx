@@ -8,13 +8,11 @@ import { StreamOptions } from "./overlay";
 export default function LiveDashboardPage({
   showId,
   isMobile,
-  liveShowStatus,
-  isPreviewStage,
+  token,
 }: {
   showId: string;
-  liveShowStatus: "LIVE" | "SCHEDULED";
   isMobile: boolean;
-  isPreviewStage: boolean;
+  token: string;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -188,13 +186,7 @@ export default function LiveDashboardPage({
           <div>Products list</div>
         </aside>
         <div className="w-full max-w-2xl mx-auto text-zinc-100 p-4">
-          {isPreviewStage ? (
-            <p className="w-full flex justify-center items-center m-1 mb-2">
-              preview stage
-            </p>
-          ) : (
-            <div>live..</div>
-          )}
+          <p>Livestage...</p>
           <div className="relative aspect-video w-full h-[80vh] overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800 shadow-lg">
             <video
               ref={videoRef}

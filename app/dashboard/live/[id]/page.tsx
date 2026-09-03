@@ -1,9 +1,8 @@
-import LiveDashboardPage from "@/components/live-dashboard";
 import { getSession } from "@/lib/dal";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { headers } from "next/headers";
-import PreviewStage from "@/components/preview-stage";
+import StreamContainer from "@/components/stream-container";
 
 export default async function page({
   params,
@@ -29,8 +28,6 @@ export default async function page({
 
   if (liveShow.status === "ENDED") redirect(`/dashboard/live/${id}/ended`);
 
-  const isPreviewStage = liveShow.status === "SCHEDULED";
-
   // checking if user is on Phone OR Laptop
   const headersList = await headers();
   const userAgent = headersList.get("user-agent") || "";
@@ -38,25 +35,12 @@ export default async function page({
 
   console.log(userAgent);
 
-  if (isPreviewStage) {
-    return (
-      <>
-        <PreviewStage
-          showId={id}
-          isMobile={isMobile}
-          liveShowStatus={liveShow.status}
-        />
-      </>
-    );
-  }
-
   return (
     <>
-      <LiveDashboardPage
+      <StreamContainer
         showId={id}
         isMobile={isMobile}
-        liveShowStatus={liveShow.status}
-        isPreviewStage={isPreviewStage}
+        initialStatus={liveShow.status}
       />
     </>
   );
