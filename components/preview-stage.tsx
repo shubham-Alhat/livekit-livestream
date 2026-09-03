@@ -31,6 +31,7 @@ export default function PreviewStage({
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const [isFlipping, setIsFlipping] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // stopStream useCallback function
   const stopStream = useCallback((stream: MediaStream | undefined | null) => {
@@ -187,12 +188,14 @@ export default function PreviewStage({
   }, []);
 
   const handleGoLiveClick = async () => {
+    setLoading(true);
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
 
     await onGoLive();
+    setLoading(false);
   };
 
   return (
@@ -276,6 +279,7 @@ export default function PreviewStage({
           )}
           <div className="w-full flex justify-center items-center mt-2.5">
             <Button
+              disabled={loading}
               onClick={handleGoLiveClick}
               className="cursor-pointer"
               type="button"

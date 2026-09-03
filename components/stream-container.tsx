@@ -35,6 +35,7 @@ export default function StreamContainer({
 
       setToken(response.token);
       setStatus("LIVE");
+      console.log("GoLive response : ", response);
     } catch (error) {
       console.error("Failed to go live:", error);
     }
