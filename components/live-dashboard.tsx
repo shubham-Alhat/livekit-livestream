@@ -9,6 +9,7 @@ import {
 
 // for default styling
 import "@livekit/components-styles";
+import { toast } from "sonner";
 
 type SavedDevice = { showId: string; deviceId: string };
 
@@ -70,15 +71,41 @@ export default function LiveDashboardPage({
   return (
     <div className="h-screen w-full bg-gray-900">
       <LiveKitRoom
-        video={deviceConfig.videoId ? { deviceId: deviceConfig.videoId } : true}
-        audio={deviceConfig.audioId ? { deviceId: deviceConfig.audioId } : true}
+        video={
+          deviceConfig.videoId && !isMobile
+            ? { deviceId: deviceConfig.videoId }
+            : true
+        }
+        audio={
+          deviceConfig.audioId && !isMobile
+            ? { deviceId: deviceConfig.audioId }
+            : true
+        }
         token={token}
+        onMediaDeviceFailure={(failure) => {
+          console.log("Device failed to load:", failure);
+          toast.error(
+            "Selected Cam and Mic not found, Falling back to default devices",
+          );
+
+          // clear localstorage
+          localStorage.removeItem("audioDeviceId");
+          localStorage.removeItem("videoDeviceId");
+
+          // update the states to rerender
+          setDeviceConfig((prev) => ({
+            ...prev,
+            audioId: undefined,
+            videoId: undefined,
+          }));
+        }}
         serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
         connect={true}
         data-lk-theme="default"
       >
-        {/* <VideoConference /> */}
         {/* our custom compoenent */}
+
+        <VideoConference />
         {/* <RoomAudioRenderer> is solely responsible for playing the audio of other people in the room. */}
         {/* ever plan to allow "co-hosts" to join the stream, or want to let a buyer join with their microphone to ask a question, the seller will not be able to hear them unless <RoomAudioRenderer> is there. */}
       </LiveKitRoom>

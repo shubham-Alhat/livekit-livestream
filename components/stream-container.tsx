@@ -10,13 +10,15 @@ export default function StreamContainer({
   showId,
   initialStatus,
   isMobile,
+  initialToken,
 }: {
   showId: string;
   initialStatus: "SCHEDULED" | "LIVE" | "ENDED";
   isMobile: boolean;
+  initialToken: string | undefined;
 }) {
   const [status, setStatus] = useState(initialStatus);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | undefined>(initialToken);
 
   // We pass this function down to PreviewStage
   const handleGoLive = async () => {
@@ -58,13 +60,4 @@ export default function StreamContainer({
   }
 
   return <div>Loading...</div>;
-  // return (
-  //   <>
-  //     <LiveDashboardPage
-  //       showId={showId}
-  //       isMobile={isMobile}
-  //       token="shubham-token"
-  //     />
-  //   </>
-  // );
 }

@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { headers } from "next/headers";
 import StreamContainer from "@/components/stream-container";
+import { AccessToken } from "livekit-server-sdk";
 
 export default async function page({
   params,
@@ -35,12 +36,33 @@ export default async function page({
 
   console.log(userAgent);
 
+  let initialToken: string | undefined = undefined;
+
+  if (liveShow.status === "LIVE") {
+    const at = new AccessToken(
+      process.env.LIVEKIT_API_KEY!,
+      process.env.LIVEKIT_API_SECRET!,
+      {
+        identity: authUser.userId,
+        name: authUser.username || "Streamer",
+      },
+    );
+    at.addGrant({
+      room: id,
+      roomJoin: true,
+      canPublish: true,
+      canSubscribe: true,
+    });
+    initialToken = await at.toJwt();
+  }
+
   return (
     <>
       <StreamContainer
         showId={id}
         isMobile={isMobile}
         initialStatus={liveShow.status}
+        initialToken={initialToken}
       />
     </>
   );
