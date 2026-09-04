@@ -41,30 +41,30 @@ export default function StreamContainer({
     }
   };
 
-  // if (status === "SCHEDULED") {
-  //   return (
-  //     <PreviewStage
-  //       showId={showId}
-  //       isMobile={isMobile}
-  //       onGoLive={handleGoLive}
-  //     />
-  //   );
-  // }
-
-  // if (status === "LIVE" && token) {
-  //   return (
-  //     <LiveDashboardPage showId={showId} isMobile={isMobile} token={token} />
-  //   );
-  // }
-
-  // return <div>Loading...</div>;
-  return (
-    <>
-      <LiveDashboardPage
+  if (status === "SCHEDULED") {
+    return (
+      <PreviewStage
         showId={showId}
         isMobile={isMobile}
-        token="shubham-token"
+        onGoLive={handleGoLive}
       />
-    </>
-  );
+    );
+  }
+
+  if (status === "LIVE" && token) {
+    return (
+      <LiveDashboardPage showId={showId} isMobile={isMobile} token={token} />
+    );
+  }
+
+  return <div>Loading...</div>;
+  // return (
+  //   <>
+  //     <LiveDashboardPage
+  //       showId={showId}
+  //       isMobile={isMobile}
+  //       token="shubham-token"
+  //     />
+  //   </>
+  // );
 }

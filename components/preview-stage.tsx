@@ -215,7 +215,7 @@ export default function PreviewStage({
               autoPlay
               playsInline
               muted
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
             />
 
             {permissionState === STATE.REQUESTING && (

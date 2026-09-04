@@ -42,12 +42,15 @@ export default function LiveDashboardPage({
     const audioDevice = getSavedDevice("audioDeviceId");
     const videoDevice = getSavedDevice("videoDeviceId");
 
-    const savedAudioId =
-      audioDevice?.showId === showId ? audioDevice.deviceId : undefined;
-    const savedVideoId =
-      videoDevice?.showId === showId ? videoDevice.deviceId : undefined;
+    const savedAudioId = audioDevice?.deviceId
+      ? audioDevice.deviceId
+      : undefined;
 
-    console.log(savedAudioId, savedVideoId);
+    const savedVideoId = videoDevice?.deviceId
+      ? videoDevice.deviceId
+      : undefined;
+
+    console.log(savedAudioId, "-----------", savedVideoId);
 
     setDeviceConfig({
       audioId: savedAudioId,
@@ -74,6 +77,7 @@ export default function LiveDashboardPage({
         connect={true}
         data-lk-theme="default"
       >
+        {/* <VideoConference /> */}
         {/* our custom compoenent */}
         {/* <RoomAudioRenderer> is solely responsible for playing the audio of other people in the room. */}
         {/* ever plan to allow "co-hosts" to join the stream, or want to let a buyer join with their microphone to ask a question, the seller will not be able to hear them unless <RoomAudioRenderer> is there. */}
