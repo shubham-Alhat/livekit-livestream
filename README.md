@@ -1,6 +1,6 @@
 # Livekit livestream app
 
-understanding preview/go live flow and handling all edge cases with livekit sdk
+handling the disconnection livekit room to avoid getting out of free plan - [Gemini](https://share.gemini.google/gYxOGGvW9GZM)
 
 ### Understand livekit and how to implement it in app
 
