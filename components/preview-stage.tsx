@@ -3,34 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Overlay, STATE, PermissionState } from "./overlay";
-import { ShareIcon, WalletIcon } from "lucide-react";
-
-const messages = [
-  { id: 1, user: "Alice", text: "This is such a great stream! 🔥" },
-  { id: 2, user: "Bob_99", text: "How much is the current bid?" },
-  { id: 3, user: "SarahK", text: "Just placed my bid 💰" },
-  { id: 4, user: "MikeT", text: "lol that's a steal at this price" },
-  { id: 5, user: "Priya_", text: "Can you zoom in on the item?" },
-  { id: 6, user: "JohnDoe", text: "Following for more auctions like this" },
-  { id: 7, user: "Alice", text: "Worth every penny 😍" },
-  { id: 8, user: "RaviK", text: "Shipping to India available?" },
-  { id: 9, user: "Emma_W", text: "🔥🔥🔥" },
-  { id: 11, user: "Bob_99", text: "Outbid! going again 😤" },
-  { id: 12, user: "Bob_99", text: "Outbid! going again 😤" },
-  { id: 13, user: "Bob_99", text: "Outbid! going again 😤" },
-  { id: 14, user: "Bob_99", text: "Outbid! going again 😤" },
-  { id: 15, user: "Bob_99", text: "Outbid! going again 😤" },
-  { id: 16, user: "Bob_99", text: "Outbid! going again 😤" },
-  { id: 17, user: "Bob_99", text: "Outbid! going again 😤" },
-  { id: 18, user: "Bob_99", text: "Outbid! going again 😤" },
-  { id: Date.now(), user: "Bob788s", text: "Outbid! going again 😤" },
-  { id: Date.now(), user: "shubhma", text: "Outbid! going again 😤" },
-  { id: Date.now(), user: "alexnnh", text: "Outbid! going again 😤" },
-  { id: Date.now(), user: "7543-jks", text: "Outbid! going again " },
-  { id: Date.now(), user: "jenny", text: "Outbid! going again " },
-  { id: Date.now(), user: "90", text: "Outbid! going again 😤" },
-  { id: Date.now(), user: "Bob_99", text: "Outbid! going again 😤" },
-];
+import { Gift, ShareIcon, Star, WalletIcon } from "lucide-react";
+import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Volume2 } from "lucide-react";
+import { VolumeX } from "lucide-react";
 
 export default function PreviewStage({
   showId,
@@ -60,6 +37,13 @@ export default function PreviewStage({
   const [isFlipping, setIsFlipping] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [isMute, setIsMute] = useState(true);
+
+  // toggleMute
+  const toggleMute = () => {
+    setIsMute((prev) => !prev);
+  };
 
   // stopStream useCallback function
   const stopStream = useCallback((stream: MediaStream | undefined | null) => {
@@ -286,36 +270,66 @@ export default function PreviewStage({
                           {/* master overlay */}
                           <div className="absolute inset-0 z-20 flex flex-col justify-between pointer-events-none">
                             {/* ---- TOP BAR ---- */}
-                            <div className="flex items-start justify-between p-3 pointer-events-auto">
+                            <div className="flex items-start justify-between p-4 pointer-events-auto">
                               {/* seller info - top left */}
-                              <div className="flex items-center gap-2">
-                                <img
-                                  src={
-                                    "https://res.cloudinary.com/diery17cm/image/upload/v1779881922/apfvnjmurhd7hsogeusm.jpg"
-                                  }
-                                  alt={"Tom Cruise"}
-                                  className="size-9 rounded-full border border-white/20"
-                                />
-                                <div className="flex flex-col leading-tight">
-                                  <span className="text-white text-sm font-semibold">
-                                    {"Tom Cruise"}
+                              <div className="flex items-center gap-3">
+                                <Avatar className="size-12 border border-white/20">
+                                  <AvatarImage
+                                    src="https://res.cloudinary.com/diery17cm/image/upload/v1779881922/apfvnjmurhd7hsogeusm.jpg"
+                                    alt="bottledbeauty"
+                                  />
+                                  <AvatarFallback>BB</AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col gap-1">
+                                  <span className="text-white text-[15px] font-semibold">
+                                    bottledbeauty
                                   </span>
-                                  <span className="flex items-center gap-1 text-yellow-400 text-xs">
-                                    ★ {4.5}
-                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="flex items-center gap-1 text-sm font-medium">
+                                      <Star className="size-3 fill-yellow-400" />{" "}
+                                      4.8
+                                    </span>
+                                    <Button
+                                      size="sm"
+                                      className="h-6 rounded-full bg-yellow-400 hover:bg-yellow-500 text-black text-xs font-semibold px-3"
+                                    >
+                                      Follow
+                                    </Button>
+                                  </div>
                                 </div>
                               </div>
 
                               {/* viewer count + giveaway - top right */}
-                              <div className="flex flex-col items-end gap-2">
-                                <div className="flex items-center gap-1 bg-red-600 rounded-full px-2 py-1 text-white text-xs font-semibold">
+                              <div className="flex flex-col items-end gap-4">
+                                <div className="flex items-center gap-1 bg-red-600 rounded-full px-2 py-1 text-white text-sm animate-pulse font-semibold">
                                   <span className="size-1.5 rounded-full bg-white animate-pulse" />
+                                  {/* <Users size={16} className="animate-pulse" /> */}
                                   {11}
                                 </div>
                                 {true && (
-                                  <div className="flex flex-col items-center bg-black/70 rounded-xl px-3 py-2 text-white text-xs">
-                                    <span>🎁</span>
-                                    <span>{34} Entries</span>
+                                  <div className="w-fit rounded-2xl bg-black/60 px-4 py-3 text-white shadow-lg">
+                                    <p className="text-sm font-semibold mb-2">
+                                      Giveaway
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                      <div className="relative">
+                                        <Gift
+                                          className="size-5 text-white"
+                                          strokeWidth={1.75}
+                                        />
+                                        {/* sparkle marks */}
+                                        <span className="absolute -top-1 -left-1 h-1 w-1 rounded-full bg-white/70" />
+                                        <span className="absolute -top-1.5 left-2 h-[3px] w-[3px] rounded-full bg-white/70" />
+                                      </div>
+                                      <div className="flex flex-col leading-tight">
+                                        <span className="text-base font-bold">
+                                          {32}
+                                        </span>
+                                        <span className="text-[11px] text-white/60 -mt-0.5">
+                                          Entries
+                                        </span>
+                                      </div>
+                                    </div>
                                   </div>
                                 )}
                               </div>
@@ -323,10 +337,20 @@ export default function PreviewStage({
 
                             {/* ---- RIGHT ICON RAIL ---- */}
                             <div className="absolute right-2 top-1/3 flex flex-col gap-4 pointer-events-auto">
-                              <button className="size-9 rounded-full bg-black/50 flex items-center justify-center text-white">
+                              <button
+                                onClick={toggleMute}
+                                className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white"
+                              >
+                                {isMute ? (
+                                  <VolumeX className="size-5" />
+                                ) : (
+                                  <Volume2 className="size-5" />
+                                )}
+                              </button>
+                              <button className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white">
                                 <ShareIcon className="size-5" />
                               </button>
-                              <button className="size-9 rounded-full bg-black/50 flex items-center justify-center text-white">
+                              <button className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white">
                                 <WalletIcon className="size-5" />
                               </button>
                             </div>
@@ -338,7 +362,7 @@ export default function PreviewStage({
                                 id="chat-box"
                                 className="flex flex-col gap-1 max-h-[30vh] overflow-y-auto lg:hidden"
                               >
-                                {messages.map((msg) => (
+                                {/* {messagePool.map((msg) => (
                                   <div
                                     key={msg.id}
                                     className="break-words whitespace-pre-wrap max-w-[80%] text-white text-sm bg-black/40 rounded-md px-2 py-1"
@@ -348,7 +372,7 @@ export default function PreviewStage({
                                     </span>
                                     {msg.text}
                                   </div>
-                                ))}
+                                ))} */}
                               </div>
 
                               {/* say something input — mobile only, desktop version lives in sidebar */}
@@ -358,29 +382,46 @@ export default function PreviewStage({
                               />
 
                               {/* product card */}
-                              <div className="flex items-center gap-3 bg-black/60 rounded-lg p-2">
-                                <img
-                                  src={
-                                    "https://res.cloudinary.com/diery17cm/image/upload/v1779897446/tknlm9ocydjm3wpqofqa.jpg"
-                                  }
-                                  alt={"My Watch"}
-                                  className="size-12 rounded-md object-cover"
-                                />
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-white text-sm font-semibold truncate">
-                                    {"Raymond watch"}
-                                  </p>
-                                  <p className="text-white/60 text-xs truncate">
-                                    {"this is tom cruise's watch"}
-                                  </p>
-                                  <p className="text-white/60 text-xs">
-                                    {10} Bids
-                                  </p>
+
+                              <div className="flex items-center justify-between gap-3 bg-black/50 rounded-xl p-2.5">
+                                {/* Left Section: Image + Text */}
+                                <div className="flex items-center gap-3 min-w-0 flex-1">
+                                  {/* Image Thumbnail */}
+                                  <div className="relative shrink-0 size-14 overflow-hidden rounded-lg border border-white/30">
+                                    <Image
+                                      src="https://res.cloudinary.com/diery17cm/image/upload/v1779897446/tknlm9ocydjm3wpqofqa.jpg"
+                                      alt="Raymond watch"
+                                      width={56}
+                                      height={56}
+                                      className="size-full object-cover"
+                                      loading="lazy"
+                                    />
+                                  </div>
+
+                                  {/* Details (Stacked Vertically) */}
+                                  <div className="flex flex-col min-w-0 flex-1">
+                                    <p className="text-white text-[15px] font-bold truncate leading-tight">
+                                      Raymond watch
+                                    </p>
+                                    <p className="text-white text-sm truncate leading-tight mt-0.5">
+                                      this is tom cruise's watch
+                                    </p>
+                                    <p className="text-white text-[13px] leading-tight mt-1">
+                                      10 Bids
+                                    </p>
+                                    <p className="text-white/60 text-xs leading-tight mt-1">
+                                      Shipping + Taxes are extra
+                                    </p>
+                                  </div>
                                 </div>
-                                <div className="flex flex-col items-end text-white text-sm">
-                                  <span className="font-bold">${29}</span>
-                                  <span className="text-red-400 text-xs">
-                                    {67}
+
+                                {/* Right Section: Price + Timer/Status */}
+                                <div className="flex flex-col items-end shrink-0 p-1.5">
+                                  <span className="text-white font-bold text-base leading-tight">
+                                    $29
+                                  </span>
+                                  <span className="text-red-500 font-semibold text-sm leading-tight mt-1">
+                                    💀 00:09
                                   </span>
                                 </div>
                               </div>
