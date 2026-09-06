@@ -218,7 +218,7 @@ export default function PreviewStage({
               <div className="flex min-w-0 size-full flex-col gap-2 [grid-area:player]">
                 <section className="relative w-full h-full min-h-0 max-h-screen lg:max-h-[calc(100vh-62px)] lg:rounded-2xl overflow-hidden bg-neutral-900 aspect-9/16">
                   {/* render a canvas element to have janky UI */}
-                  <div className="flex aspect-9/16 h-full flex-col">
+                  <div className="flex aspect-9/16 h-full w-full flex-col">
                     <div
                       className="w-full flex-1"
                       style={{
