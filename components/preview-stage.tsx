@@ -9,6 +9,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Volume2 } from "lucide-react";
 import { VolumeX } from "lucide-react";
 
+interface ChatMessage {
+  id: string;
+  text: string;
+  user: string;
+}
+
 export default function PreviewStage({
   showId,
   isMobile,
@@ -20,6 +26,24 @@ export default function PreviewStage({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { id: "01", text: "Hello world by whatnot", user: "Whatnot_user" },
+    { id: "02", text: "This item looks amazing!", user: "collector_23" },
+    { id: "03", text: "Is shipping included?", user: "buyer_mike" },
+    { id: "04", text: "Placing my bid now 🔥", user: "Whatnot_user" },
+    { id: "05", text: "How many left in stock?", user: "sarah_j" },
+    { id: "06", text: "First time here, loving the vibe", user: "newbie99" },
+    { id: "07", text: "Can you show the back side?", user: "collector_23" },
+    { id: "08", text: "That price is a steal", user: "deal_hunter" },
+    { id: "09", text: "GG well played everyone", user: "buyer_mike" },
+    { id: "10", text: "Adding to cart right away", user: "sarah_j" },
+    { id: "11", text: "Does this ship internationally?", user: "eu_buyer_88" },
+    { id: "12", text: "Loving this stream today", user: "Whatnot_user" },
+    { id: "13", text: "Next item please!", user: "newbie99" },
+    { id: "14", text: "Condition looks mint", user: "collector_23" },
+    { id: "15", text: "Thanks for the great deal 🙌", user: "deal_hunter" },
+  ]);
 
   const [permissionState, setPermissionState] = useState<PermissionState>(
     STATE.IDLE,
@@ -307,7 +331,15 @@ export default function PreviewStage({
                                   {11}
                                 </div>
                                 {true && (
-                                  <div className="w-fit rounded-2xl bg-black/60 px-4 py-3 text-white shadow-lg">
+                                  <div className="relative overflow-hidden w-fit rounded-2xl bg-black/50 px-4 py-3 text-white shadow-lg">
+                                    <div
+                                      className="shine-sweep pointer-events-none absolute inset-0 w-1/2 h-[300%] -top-[100%]"
+                                      style={{
+                                        background:
+                                          "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)",
+                                      }}
+                                    />
+
                                     <p className="text-sm font-semibold mb-2">
                                       Giveaway
                                     </p>
@@ -358,28 +390,44 @@ export default function PreviewStage({
                             {/* ---- BOTTOM STACK ---- */}
                             <div className="flex flex-col gap-2 p-3 pointer-events-auto">
                               {/* chat feed — overlay only on mobile */}
+
                               <div
                                 id="chat-box"
-                                className="flex flex-col gap-1 max-h-[30vh] overflow-y-auto lg:hidden"
+                                className="flex flex-col gap-4 max-h-[40vh] overflow-y-auto px-4 pb-2 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:hidden"
                               >
-                                {/* {messagePool.map((msg) => (
+                                {messages.map((msg) => (
                                   <div
                                     key={msg.id}
-                                    className="break-words whitespace-pre-wrap max-w-[80%] text-white text-sm bg-black/40 rounded-md px-2 py-1"
+                                    className="flex flex-row items-start gap-2 w-full max-w-full"
                                   >
-                                    <span className="font-semibold">
-                                      {msg.user}:{" "}
-                                    </span>
-                                    {msg.text}
+                                    {/* Avatar Circle */}
+                                    <div className="w-7 h-7 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-black text-xs font-bold mt-0.5">
+                                      {msg.user.charAt(0).toUpperCase()}
+                                    </div>
+
+                                    {/* Username and Message Container */}
+                                    <div className="flex flex-col leading-tight min-w-0 flex-1">
+                                      {/* Username */}
+                                      <span className="text-white font-bold text-sm drop-shadow-md truncate">
+                                        {msg.user}
+                                      </span>
+
+                                      {/* Actual Message */}
+                                      <span className="text-orange-500 text-sm font-medium drop-shadow-md block truncate w-full">
+                                        {msg.text}
+                                      </span>
+                                    </div>
                                   </div>
-                                ))} */}
+                                ))}
                               </div>
 
-                              {/* say something input — mobile only, desktop version lives in sidebar */}
-                              <input
-                                placeholder="Say something..."
-                                className="lg:hidden w-full rounded-full bg-black/40 border border-white/20 text-white text-sm px-4 py-2 placeholder:text-white/50"
-                              />
+                              {/* say something input — mobile only */}
+                              <div className="px-4 py-2 w-full lg:hidden">
+                                <input
+                                  placeholder="Say something..."
+                                  className="w-full rounded-full bg-transparent border border-white text-white text-sm px-4 py-2 placeholder:text-white/80 focus:outline-none focus:ring-1 focus:ring-white drop-shadow-md"
+                                />
+                              </div>
 
                               {/* product card */}
 

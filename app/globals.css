@@ -128,3 +128,16 @@
     @apply font-sans;
   }
 }
+
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(30deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(30deg);
+  }
+}
+
+.shine-sweep {
+  animation: shine-sweep 4s ease-in-out infinite;
+}
