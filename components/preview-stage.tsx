@@ -243,7 +243,7 @@ export default function PreviewStage({
   return (
     <>
       <div>
-        <header className="w-full h-[62px] justify-center items-center bg-black text-blue-200 hidden lg:flex sticky top-0 z-50">
+        <header className="w-full h-[62px] justify-center items-center bg-black text-blue-200 hidden lg:flex">
           <nav>WELCOME TO KICK</nav>
         </header>
         {/* MAIN COMP */}
