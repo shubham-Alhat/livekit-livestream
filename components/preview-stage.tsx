@@ -247,6 +247,9 @@ export default function PreviewStage({
           <nav>WELCOME TO KICK</nav>
         </header>
         {/* MAIN COMP */}
+        {/* current status :  */}
+        {/* min-h-dvh and redbg in main tag */}
+        {/* remove fixed from second child div */}
         <main className="min-h-dvh lg:min-h-0 lg:h-[calc(100vh-62px)] bg-red-700">
           <div className="bg-neutral-25 px-4 pb-4">
             <div className="block lg:grid gap-4 lg:relative inset-0 lg:py-4 overflow-y-scroll lg:overflow-y-auto h-screen lg:h-[calc(100vh-62px)] lg:min-h-0 items-start mb-4 grid-rows-1 [grid-template-areas:'shop_player_sidebar'] grid-cols-[minmax(230px,1fr)_minmax(500px,2fr)_minmax(250px,1fr)]">
