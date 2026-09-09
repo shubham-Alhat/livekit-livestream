@@ -250,7 +250,7 @@ export default function PreviewStage({
         {/* current status :  */}
         {/* min-h-dvh and redbg in main tag */}
         {/* remove fixed from second child div */}
-        <main className="h-dvh overflow-hidden lg:min-h-0 lg:h-[calc(100vh-62px)] bg-red-700 flex flex-col">
+        <main className="min-h-screen overflow-hidden lg:min-h-0 lg:h-[calc(100vh-62px)] bg-red-700 flex flex-col">
           <div className="bg-neutral-25 px-4 py-4 flex-1 flex flex-col min-h-0">
             <div className="block lg:grid gap-4 lg:relative fixed inset-0 overflow-y-auto lg:overflow-y-auto h-full lg:h-[calc(100vh-62px)] lg:min-h-0 items-start grid-rows-1 [grid-template-areas:'shop_player_sidebar'] grid-cols-[minmax(230px,1fr)_minmax(500px,2fr)_minmax(250px,1fr)]">
               {/* streamer section - centered one */}
