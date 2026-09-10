@@ -365,7 +365,7 @@ export default function PreviewStage({
                           </div>
 
                           {/* ---- RIGHT ICON RAIL ---- */}
-                          <div className="absolute right-2 top-1/3 flex flex-col gap-4">
+                          <div className="absolute right-3 top-1/3 flex flex-col gap-4 pointer-events-auto">
                             <button
                               onClick={toggleMute}
                               className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
@@ -396,7 +396,7 @@ export default function PreviewStage({
 
                             <div
                               id="chat-box"
-                              className="flex flex-col gap-4 max-h-[40vh] overflow-y-auto px-4 pb-2 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:hidden"
+                              className="pointer-events-auto flex flex-col gap-4 max-h-[40vh] max-w-8/12 overflow-y-auto px-4 pb-2 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:hidden"
                             >
                               {messages.map((msg) => (
                                 <div
