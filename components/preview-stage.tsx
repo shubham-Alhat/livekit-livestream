@@ -282,12 +282,15 @@ export default function PreviewStage({
                         <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-black/70 to-transparent z-10 pointer-events-none" />
                         {/* ---------------------------- */}
                         {/* master overlay */}
-                        <div className="absolute inset-0 z-20 flex flex-col pointer-events-none">
+                        <div className="absolute inset-0 flex flex-col pointer-events-none">
                           {/* ---- TOP BAR ---- */}
-                          <div className="absolute top-0 inset-x-0 flex items-start justify-between p-4 pointer-events-auto">
+                          <div className="absolute top-0 inset-x-0 flex items-start justify-between p-4">
                             {/* seller info - top left */}
-                            <div className="flex items-center gap-3">
-                              <Avatar className="size-12 border border-white/20">
+                            <div className="flex items-center gap-3 pointer-events-auto">
+                              <Avatar
+                                onClick={() => console.log("Avatar")}
+                                className="size-12 border border-white/20"
+                              >
                                 <AvatarImage
                                   src="https://res.cloudinary.com/diery17cm/image/upload/v1779881922/apfvnjmurhd7hsogeusm.jpg"
                                   alt="bottledbeauty"
@@ -295,7 +298,10 @@ export default function PreviewStage({
                                 <AvatarFallback>BB</AvatarFallback>
                               </Avatar>
                               <div className="flex flex-col gap-1">
-                                <span className="text-white text-[15px] font-semibold">
+                                <span
+                                  onClick={() => console.log("username:seller")}
+                                  className="text-white text-[15px] font-semibold"
+                                >
                                   bottledbeauty
                                 </span>
                                 <div className="flex items-center gap-2">
@@ -304,6 +310,7 @@ export default function PreviewStage({
                                     4.8
                                   </span>
                                   <Button
+                                    onClick={() => console.log("follow btn")}
                                     size="sm"
                                     className="h-6 rounded-full bg-yellow-400 hover:bg-yellow-500 text-black text-xs font-semibold px-3"
                                   >
@@ -358,10 +365,10 @@ export default function PreviewStage({
                           </div>
 
                           {/* ---- RIGHT ICON RAIL ---- */}
-                          <div className="absolute right-2 top-1/3 flex flex-col gap-4 pointer-events-auto">
+                          <div className="absolute right-2 top-1/3 flex flex-col gap-4">
                             <button
                               onClick={toggleMute}
-                              className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white"
+                              className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
                             >
                               {isMute ? (
                                 <VolumeX className="size-5" />
@@ -369,16 +376,22 @@ export default function PreviewStage({
                                 <Volume2 className="size-5" />
                               )}
                             </button>
-                            <button className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white">
+                            <button
+                              onClick={() => console.log("share")}
+                              className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
+                            >
                               <ShareIcon className="size-5" />
                             </button>
-                            <button className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white">
+                            <button
+                              onClick={() => console.log("wallet")}
+                              className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
+                            >
                               <WalletIcon className="size-5" />
                             </button>
                           </div>
 
                           {/* ---- BOTTOM STACK ---- */}
-                          <div className="flex flex-col gap-2 p-3 pointer-events-auto absolute inset-x-0 bottom-0">
+                          <div className="flex flex-col gap-2 p-3 absolute inset-x-0 bottom-0">
                             {/* chat feed — overlay only on mobile */}
 
                             <div
@@ -412,9 +425,10 @@ export default function PreviewStage({
                             </div>
 
                             {/* say something input — mobile only */}
-                            <div className="px-4 py-2 w-full lg:hidden">
+                            <div className="px-4 py-2 w-full lg:hidden pointer-events-auto">
                               <input
                                 placeholder="Say something..."
+                                onChange={(e) => console.log(e.target.value)}
                                 className="w-full rounded-full bg-transparent border border-white text-white text-sm px-4 py-2 placeholder:text-white/80 focus:outline-none focus:ring-1 focus:ring-white drop-shadow-md"
                               />
                             </div>
@@ -465,11 +479,17 @@ export default function PreviewStage({
                             </div>
 
                             {/* bid buttons */}
-                            <div className="flex gap-2">
-                              <button className="flex-1 rounded-full bg-white/10 text-white text-sm font-semibold py-2">
+                            <div className="flex gap-2 pointer-events-auto">
+                              <button
+                                onClick={() => console.log("custom btn")}
+                                className="flex-1 rounded-full bg-white/10 text-white text-sm font-semibold py-2"
+                              >
                                 Custom
                               </button>
-                              <button className="flex-[2] rounded-full bg-yellow-400 text-black text-sm font-bold py-2">
+                              <button
+                                onClick={() => console.log("bid btn")}
+                                className="flex-[2] rounded-full bg-yellow-400 text-black text-sm font-bold py-2"
+                              >
                                 Bid: ${101}
                               </button>
                             </div>
