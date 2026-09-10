@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Volume2 } from "lucide-react";
 import { VolumeX } from "lucide-react";
+import { Navbar } from "./navbar";
 
 interface ChatMessage {
   id: string;
@@ -242,10 +243,8 @@ export default function PreviewStage({
 
   return (
     <>
-      <div>
-        <header className="w-full h-[62px] flex justify-center items-center bg-black text-blue-200 hidden lg:flex sticky top-0 z-50">
-          <nav>WELCOME TO KICK</nav>
-        </header>
+      <main className="min-h-screen min-w-0 max-w-full overflow-hidden bg-neutral-100 text-neutral-950">
+        <Navbar />
         {/* MAIN COMP */}
         <main className="min-h-screen lg:min-h-0 lg:h-[calc(100vh-62px)] bg-blue-500">
           <div className="bg-neutral-25 px-4 pb-4">
@@ -502,7 +501,7 @@ export default function PreviewStage({
             </div>
           </div>
         </main>
-      </div>
+      </main>
     </>
   );
 }
