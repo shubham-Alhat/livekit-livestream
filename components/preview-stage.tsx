@@ -247,7 +247,7 @@ export default function PreviewStage({
           <nav>WELCOME TO KICK</nav>
         </header>
         {/* MAIN COMP */}
-        <main className="h-svh lg:min-h-0 lg:h-[calc(100vh-62px)] bg-blue-500">
+        <main className="h-svh overflow-hidden lg:min-h-0 lg:h-[calc(100vh-62px)] bg-blue-500">
           <div className="bg-neutral-25 px-4 pb-4">
             <div className="block lg:grid gap-4 fixed lg:relative inset-0 lg:py-4 overflow-y-scroll lg:overflow-y-auto h-svh lg:h-[calc(100vh-62px)] lg:min-h-0 items-start mb-4 grid-rows-1 [grid-template-areas:'shop_player_sidebar'] grid-cols-[minmax(230px,1fr)_minmax(500px,2fr)_minmax(250px,1fr)]">
               {/* streamer section - centered one */}
@@ -278,8 +278,8 @@ export default function PreviewStage({
 
                         {/* actual overlay component */}
                         {/* 1. scrim layer at top and bottom - gradient bg for visible text : DIVS are self closing */}
-                        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/60 to-transparent z-10 pointer-events-none" />
-                        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-black/70 to-transparent z-10 pointer-events-none" />
+                        {/* <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/60 to-transparent z-10 pointer-events-none" />
+                        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-black/70 to-transparent z-10 pointer-events-none" /> */}
                         {/* ---------------------------- */}
                         {/* master overlay */}
                         <div className="absolute inset-0 flex flex-col pointer-events-none">
