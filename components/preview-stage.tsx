@@ -249,7 +249,7 @@ export default function PreviewStage({
         {/* MAIN COMP */}
         {/* <main className="max-h-svh min-h-0 overflow-hidden overscroll-none lg:min-h-0 lg:h-[calc(100vh-62px)] lg:overflow-auto lg:overscroll-auto bg-blue-500"> */}
         {/* <div className="bg-neutral-25 px-4 pb-4"> */}
-        <div className="block lg:px-4 lg:min-w-0 lg:py-4 lg:grid gap-4 fixed lg:relative inset-0 overflow-y-scroll overscroll-y-none lg:overflow-y-auto h-svh lg:h-[calc(100vh-62px)] lg:min-h-0 items-start mb-4 grid-rows-1 [grid-template-areas:'shop_player_sidebar'] grid-cols-[minmax(230px,1fr)_minmax(500px,2fr)_minmax(250px,1fr)]">
+        <div className="block lg:px-4 lg:min-w-0 lg:py-4 lg:grid gap-4 fixed lg:relative inset-0 overflow-y-scroll lg:overflow-y-auto h-svh lg:h-[calc(100vh-62px)] lg:min-h-0 items-start mb-4 grid-rows-1 [grid-template-areas:'shop_player_sidebar'] grid-cols-[minmax(230px,1fr)_minmax(500px,2fr)_minmax(250px,1fr)]">
           {/* streamer section - centered one */}
           <div className="flex min-w-0 size-full flex-col gap-2 [grid-area:player]">
             <section className="relative w-full h-full min-h-0 max-h-svh lg:max-h-[calc(100vh-62px)] lg:rounded-2xl overflow-hidden bg-neutral-900 aspect-9/16">
