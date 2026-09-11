@@ -504,7 +504,7 @@ export default function PreviewStage({
               shp/product area
             </div>
             {/* chat area - third cloumn */}
-            <div className="flex flex-col min-w-0 w-full min-h-0 h-full lg:min-h-0 lg:h-full overflow-auto [grid-area:sidebar] bg-amber-400">
+            <div className="hidden lg:flex flex-col min-w-0 w-full min-h-0 h-full lg:min-h-0 lg:h-full overflow-auto [grid-area:sidebar] bg-amber-400">
               Chat box
             </div>
           </div>
