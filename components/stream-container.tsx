@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import PreviewStage from "./preview-stage";
+
 import LiveDashboardPage from "./live-dashboard";
 import { goLive } from "@/actions/show";
 import { toast } from "sonner";
+import Preview from "./preview";
 
 export default function StreamContainer({
   showId,
@@ -45,11 +46,7 @@ export default function StreamContainer({
 
   if (status === "SCHEDULED") {
     return (
-      <PreviewStage
-        showId={showId}
-        isMobile={isMobile}
-        onGoLive={handleGoLive}
-      />
+      <Preview showId={showId} isMobile={isMobile} onGoLive={handleGoLive} />
     );
   }
 
