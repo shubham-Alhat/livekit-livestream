@@ -257,83 +257,14 @@ export default function Preview({
                       {/* master overlay */}
                       <div className="absolute inset-0 flex flex-col pointer-events-none">
                         {/* ---- TOP BAR ---- */}
-                        <div className="absolute top-0 inset-x-0 flex items-start justify-between p-4">
+                        <div className="absolute top-0 inset-x-0 flex items-start justify-center p-4">
                           {/* seller info - top left */}
-                          <div className="flex items-center gap-3 pointer-events-auto">
-                            <Avatar
-                              onClick={() => console.log("Avatar")}
-                              className="size-12 border border-white/20"
-                            >
-                              <AvatarImage
-                                src="https://res.cloudinary.com/diery17cm/image/upload/v1779881922/apfvnjmurhd7hsogeusm.jpg"
-                                alt="bottledbeauty"
-                              />
-                              <AvatarFallback>BB</AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col gap-1">
-                              <span
-                                onClick={() => console.log("username:seller")}
-                                className="text-white text-[15px] font-semibold"
-                              >
-                                bottledbeauty
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <span className="flex items-center gap-1 text-sm font-medium">
-                                  <Star className="size-3 fill-yellow-400" />{" "}
-                                  4.8
-                                </span>
-                                <Button
-                                  onClick={() => console.log("follow btn")}
-                                  size="sm"
-                                  className="h-6 rounded-full bg-yellow-400 hover:bg-yellow-500 text-black text-xs font-semibold px-3"
-                                >
-                                  Follow
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
 
                           {/* viewer count + giveaway - top right */}
                           <div className="flex flex-col items-end gap-4">
                             <div className="flex items-center gap-1 bg-red-600 rounded-full px-2 py-1 text-white text-sm animate-pulse font-semibold">
-                              <span className="size-1.5 rounded-full bg-white animate-pulse" />
-                              {/* <Users size={16} className="animate-pulse" /> */}
-                              {11}
+                              {"preview stage"}
                             </div>
-                            {true && (
-                              <div className="relative overflow-hidden w-fit rounded-2xl bg-black/50 px-4 py-3 text-white shadow-lg">
-                                <div
-                                  className="shine-sweep pointer-events-none absolute inset-0 w-1/2 h-[300%] -top-[100%]"
-                                  style={{
-                                    background:
-                                      "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)",
-                                  }}
-                                />
-
-                                <p className="text-sm font-semibold mb-2">
-                                  Giveaway
-                                </p>
-                                <div className="flex items-center gap-2">
-                                  <div className="relative">
-                                    <Gift
-                                      className="size-5 text-white"
-                                      strokeWidth={1.75}
-                                    />
-                                    {/* sparkle marks */}
-                                    <span className="absolute -top-1 -left-1 h-1 w-1 rounded-full bg-white/70" />
-                                    <span className="absolute -top-1.5 left-2 h-[3px] w-[3px] rounded-full bg-white/70" />
-                                  </div>
-                                  <div className="flex flex-col leading-tight">
-                                    <span className="text-base font-bold">
-                                      {32}
-                                    </span>
-                                    <span className="text-[11px] text-white/60 -mt-0.5">
-                                      Entries
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
                           </div>
                         </div>
 
@@ -349,10 +280,7 @@ export default function Preview({
                               <Volume2 className="size-5" />
                             )}
                           </button>
-                          <button
-                            onClick={() => console.log("share")}
-                            className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
-                          >
+                          <button className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto">
                             <SwitchCamera className="size-5" />
                           </button>
                         </div>
