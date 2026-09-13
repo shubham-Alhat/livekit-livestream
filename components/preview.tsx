@@ -44,13 +44,6 @@ export default function Preview({
   const [isSwitching, setIsSwitching] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [isMute, setIsMute] = useState(true);
-
-  // toggleMute
-  const toggleMute = () => {
-    setIsMute((prev) => !prev);
-  };
-
   // stopStream useCallback function
   const stopStream = useCallback((stream: MediaStream | undefined | null) => {
     if (!stream) return;
@@ -224,16 +217,16 @@ export default function Preview({
       streamRef.current = null;
     }
 
-    await onGoLive();
+    // await onGoLive();
     setLoading(false);
   };
 
   const handleToggleCamera = async () => {
     if (!streamRef.current) return;
 
-    stopStream(streamRef.current);
+    setIsFlipping(true);
 
-    setIsSwitching(true);
+    stopStream(streamRef.current);
     const newFacingMode = facingMode === "user" ? "environment" : "user";
 
     setFacingMode(newFacingMode);
@@ -245,9 +238,11 @@ export default function Preview({
       });
 
       attachStream(newVideoStream);
+      setIsFlipping(false);
     } catch (error) {
       console.log(error);
       setErrorMessage("Failed to flip camera");
+      setPermissionState(STATE.ERROR);
     }
   };
 
@@ -283,6 +278,23 @@ export default function Preview({
                         className="h-full w-full object-cover sm:object-contain"
                       />
 
+                      {/* error overlay layout */}
+                      {permissionState === STATE.REQUESTING && (
+                        <Overlay text="Requesting camera access…" />
+                      )}
+                      {isSwitching && permissionState === STATE.READY && (
+                        <Overlay text="Switching device…" subtle />
+                      )}
+                      {permissionState === STATE.DENIED && (
+                        <Overlay text={errorMessage} tone="error" />
+                      )}
+                      {permissionState === STATE.NO_DEVICE && (
+                        <Overlay text={errorMessage} tone="error" />
+                      )}
+                      {permissionState === STATE.ERROR && (
+                        <Overlay text={errorMessage} tone="error" />
+                      )}
+
                       {/* master overlay */}
                       <div className="absolute inset-0 flex flex-col pointer-events-none">
                         {/* ---- TOP BAR ---- */}
@@ -298,27 +310,15 @@ export default function Preview({
                         </div>
 
                         {/* ---- RIGHT ICON RAIL ---- */}
-                        <div className="absolute right-3 top-1/3 flex flex-col gap-4 pointer-events-auto">
+                        {isMobile && (
                           <button
-                            onClick={toggleMute}
-                            className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
+                            onClick={handleToggleCamera}
+                            disabled={isFlipping}
+                            className="pointer-events-auto absolute top-4 right-4 rounded-full bg-black/60 backdrop-blur px-4 py-2 text-sm font-medium text-white disabled:opacity-50 transition-opacity hover:bg-black/80"
                           >
-                            {isMute ? (
-                              <VolumeX className="size-5" />
-                            ) : (
-                              <Volume2 className="size-5" />
-                            )}
+                            {isFlipping ? "Flipping…" : "Flip camera"}
                           </button>
-                          {isMobile && (
-                            <button
-                              onClick={handleToggleCamera}
-                              className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
-                            >
-                              <SwitchCamera className="size-5" />
-                            </button>
-                          )}
-                        </div>
-
+                        )}
                         {/* ---- BOTTOM STACK ---- */}
                         <div className="flex flex-col justify-center items-center gap-2 p-3 absolute inset-x-0 bottom-0 pointer-events-auto">
                           {!isMobile && (
