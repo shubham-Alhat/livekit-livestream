@@ -236,6 +236,8 @@ export default function Preview({
     setIsSwitching(true);
     const newFacingMode = facingMode === "user" ? "environment" : "user";
 
+    setFacingMode(newFacingMode);
+
     try {
       const newVideoStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { exact: newFacingMode } },
