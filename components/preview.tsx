@@ -228,6 +228,27 @@ export default function Preview({
     setLoading(false);
   };
 
+  const handleToggleCamera = async () => {
+    if (!streamRef.current) return;
+
+    stopStream(streamRef.current);
+
+    setIsSwitching(true);
+    const newFacingMode = facingMode === "user" ? "environment" : "user";
+
+    try {
+      const newVideoStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: newFacingMode } },
+        audio: true,
+      });
+
+      attachStream(newVideoStream);
+    } catch (error) {
+      console.log(error);
+      setErrorMessage("Failed to flip camera");
+    }
+  };
+
   return (
     <>
       <div>
@@ -286,9 +307,14 @@ export default function Preview({
                               <Volume2 className="size-5" />
                             )}
                           </button>
-                          <button className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto">
-                            <SwitchCamera className="size-5" />
-                          </button>
+                          {isMobile && (
+                            <button
+                              onClick={handleToggleCamera}
+                              className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
+                            >
+                              <SwitchCamera className="size-5" />
+                            </button>
+                          )}
                         </div>
 
                         {/* ---- BOTTOM STACK ---- */}

@@ -25,7 +25,8 @@ export default async function page({
 
   if (!liveShow) notFound();
 
-  if (liveShow.streamerId !== authUser.userId) redirect("/dashboard");
+  if (liveShow.streamerId !== authUser.userId)
+    redirect("/dashboard?unauthorized=true");
 
   if (liveShow.status === "ENDED") redirect(`/dashboard/live/${id}/ended`);
 
