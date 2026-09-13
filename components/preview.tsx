@@ -123,6 +123,12 @@ export default function Preview({
         "videoDeviceId",
         JSON.stringify({ showId: showId, deviceId: id }),
       );
+
+      const videoTrack = newStream.getVideoTracks()[0];
+      const { width, height } = videoTrack.getSettings();
+
+      console.log("Irium width:", width);
+      console.log("Irium height:", height);
     } catch (error) {
       console.log(error);
       handleGetUserMediaError(error);
@@ -218,7 +224,7 @@ export default function Preview({
       streamRef.current = null;
     }
 
-    // await onGoLive();
+    await onGoLive();
     setLoading(false);
   };
 
