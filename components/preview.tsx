@@ -1,13 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-
-import { Overlay, STATE, PermissionState } from "./overlay";
-
-import { PreJoin } from "@livekit/components-react";
-import "@livekit/components-styles";
-
-export default function Preview({
+export default function PreviewStage({
   showId,
   isMobile,
   onGoLive,
@@ -23,33 +16,8 @@ export default function Preview({
   //     streamRef.current = null;
   //   }
 
-  //   await onGoLive();
+  //   // await onGoLive();
   //   setLoading(false);
-  // };
-
-  // const handleToggleCamera = async () => {
-  //   if (!streamRef.current) return;
-
-  //   setIsFlipping(true);
-
-  //   stopStream(streamRef.current);
-  //   const newFacingMode = facingMode === "user" ? "environment" : "user";
-
-  //   setFacingMode(newFacingMode);
-
-  //   try {
-  //     const newVideoStream = await navigator.mediaDevices.getUserMedia({
-  //       video: { facingMode: { exact: newFacingMode } },
-  //       audio: true,
-  //     });
-
-  //     attachStream(newVideoStream);
-  //     setIsFlipping(false);
-  //   } catch (error) {
-  //     console.log(error);
-  //     setErrorMessage("Failed to flip camera");
-  //     setPermissionState(STATE.ERROR);
-  //   }
   // };
 
   return (
@@ -65,8 +33,27 @@ export default function Preview({
             <div className="flex min-w-0 min-h-0 w-full h-full flex-col gap-2 [grid-area:player]">
               <section className="relative w-full lg:min-h-0 h-svh lg:h-full lg:rounded-2xl overflow-hidden bg-neutral-900 aspect-9/16">
                 {/* render a canvas element to have janky UI */}
-
-                <PreJoin className="preview-stage" />
+                <div className="flex aspect-9/16 size-full flex-col">
+                  <div
+                    className="w-full flex-1"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      overflow: "hidden",
+                      backgroundColor: "rgb(0,0,0)",
+                    }}
+                  >
+                    <div className="w-full h-full">
+                      <video
+                        // ref={videoRef}
+                        autoPlay
+                        playsInline
+                        muted
+                        className="h-full w-full object-cover sm:object-contain"
+                      />
+                    </div>
+                  </div>
+                </div>
               </section>
             </div>
             {/* shop area - first column */}
