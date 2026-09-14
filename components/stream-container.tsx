@@ -41,6 +41,7 @@ export default function StreamContainer({
       console.log("GoLive response : ", response);
     } catch (error) {
       console.error("Failed to go live:", error);
+      toast.error("Error while going live!");
     }
   };
 
