@@ -1,6 +1,11 @@
 "use client";
 
-export default function PreviewStage({
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Button } from "./ui/button";
+import { STATE, PermissionState, Overlay } from "./overlay";
+import { cn } from "@/lib/utils";
+
+export default function Preview({
   showId,
   isMobile,
   onGoLive,
@@ -9,16 +14,230 @@ export default function PreviewStage({
   isMobile: boolean;
   onGoLive: () => Promise<void>;
 }) {
-  // const handleGoLiveClick = async () => {
-  //   setLoading(true);
-  //   if (streamRef.current) {
-  //     streamRef.current.getTracks().forEach((track) => track.stop());
-  //     streamRef.current = null;
-  //   }
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
-  //   // await onGoLive();
-  //   setLoading(false);
-  // };
+  const [permissionState, setPermissionState] = useState<PermissionState>(
+    STATE.IDLE,
+  );
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  // correct useStates for devices picker and deviceIds
+  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
+  const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedVideoId, setSelectedVideoId] = useState("");
+  const [selectedAudioId, setSelectedAudioId] = useState("");
+
+  // states for facingMode
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  const [shouldMirror, setShouldMirror] = useState<boolean>(false);
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [isSwitching, setIsSwitching] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // stopStream useCallback function
+  const stopStream = useCallback((stream: MediaStream | undefined | null) => {
+    if (!stream) return;
+    stream.getTracks().forEach((track) => track.stop());
+  }, []);
+
+  // attach stream useCallback
+  const attachStream = useCallback((stream: MediaStream) => {
+    stopStream(streamRef.current);
+    streamRef.current = stream;
+
+    const track = stream.getVideoTracks()[0];
+    const settings = track.getSettings();
+
+    console.log("facingMode : ", settings.facingMode);
+
+    // Only mirror if the browser confirms it's an actual front-facing camera.
+    // External/virtual cams (iPhone via Continuity, OBS, Camo, etc.) report
+    // facingMode as undefined — never auto-mirror those.
+    setShouldMirror(settings.facingMode === "user");
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, []);
+
+  const handleGetUserMediaError = (err: any) => {
+    if (err.name === "NotAllowedError" || err.name === "SecurityError") {
+      setPermissionState(STATE.DENIED);
+      setErrorMessage(
+        "Camera/mic access was blocked. Enable it in your browser's site settings and reload.",
+      );
+    } else if (
+      err.name === "NotFoundError" ||
+      err.name === "DevicesNotFoundError"
+    ) {
+      setPermissionState(STATE.NO_DEVICE);
+      setErrorMessage("No camera or microphone was found on this device.");
+    } else if (
+      err.name === "NotReadableError" ||
+      err.name === "TrackStartError"
+    ) {
+      setPermissionState(STATE.ERROR);
+      setErrorMessage(
+        "The camera is already in use by another app or tab. Close it and try again.",
+      );
+    } else {
+      setPermissionState(STATE.ERROR);
+      setErrorMessage(
+        `Could not access camera/mic: ${err?.message || "Unknown error"}`,
+      );
+    }
+  };
+
+  // enumerate devices
+  const enumerate = useCallback(async () => {
+    console.log("enumerate devices function get called..", Date.now());
+    const all = await navigator.mediaDevices.enumerateDevices();
+    const cams = all.filter((d) => d.kind === "videoinput");
+    const mics = all.filter((d) => d.kind === "audioinput");
+    setVideoDevices(cams);
+    setAudioDevices(mics);
+    return { cams, mics };
+  }, []);
+
+  const onSelectVideo = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    console.log(id);
+    setSelectedVideoId(id);
+    stopStream(streamRef.current);
+    try {
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: id } },
+        audio: selectedAudioId
+          ? { deviceId: { exact: selectedAudioId } }
+          : true,
+      });
+
+      attachStream(newStream);
+      localStorage.setItem(
+        "videoDeviceId",
+        JSON.stringify({ showId: showId, deviceId: id }),
+      );
+
+      const videoTrack = newStream.getVideoTracks()[0];
+      const { width, height } = videoTrack.getSettings();
+    } catch (error) {
+      console.log(error);
+      handleGetUserMediaError(error);
+    }
+  };
+
+  const onSelectAudio = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    console.log(id);
+    setSelectedAudioId(id);
+    stopStream(streamRef.current);
+    try {
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: selectedVideoId
+          ? { deviceId: { exact: selectedVideoId } }
+          : true,
+        audio: { deviceId: { exact: id } },
+      });
+
+      attachStream(newStream);
+      localStorage.setItem(
+        "audioDeviceId",
+        JSON.stringify({ showId: showId, deviceId: id }),
+      );
+    } catch (error) {
+      console.log(error);
+      handleGetUserMediaError(error);
+    }
+  };
+
+  // initial camera & audio access and listing devices options
+  useEffect(() => {
+    let ignore = false;
+
+    async function init() {
+      try {
+        setPermissionState(STATE.REQUESTING);
+        const initialStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+
+        if (ignore) {
+          initialStream.getTracks().forEach((t) => t.stop());
+          console.log(
+            "Discarded stale stream:",
+            initialStream.getTracks().map((t) => t.id),
+          );
+          return;
+        }
+
+        attachStream(initialStream);
+
+        console.log(
+          "Active stream tracks:",
+          initialStream.getTracks().map((t) => `${t.kind}:${t.id}`),
+        );
+        setPermissionState(STATE.READY);
+
+        // emurateDevice Only for laptop/pc
+        if (!isMobile) await enumerate();
+      } catch (error) {
+        console.log(error);
+        if (!ignore) handleGetUserMediaError(error);
+      }
+    }
+    init();
+
+    return () => {
+      ignore = true;
+
+      console.log("cleanup: unmounting, stopping camera");
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => {
+          t.stop();
+          console.log(`Stopped track: ${t.kind} (${t.label})`);
+        });
+        streamRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleGoLiveClick = async () => {
+    setLoading(true);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+
+    // await onGoLive();
+    setLoading(false);
+  };
+
+  const handleToggleCamera = async () => {
+    if (!streamRef.current) return;
+
+    stopStream(streamRef.current);
+
+    setIsFlipping(true);
+    const newFacingMode = facingMode === "user" ? "environment" : "user";
+
+    setFacingMode(newFacingMode);
+
+    try {
+      const newVideoStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: newFacingMode } },
+        audio: true,
+      });
+
+      attachStream(newVideoStream);
+    } catch (error) {
+      console.log(error);
+      handleGetUserMediaError(error);
+    } finally {
+      setIsFlipping(false);
+    }
+  };
 
   return (
     <>
@@ -45,12 +264,93 @@ export default function PreviewStage({
                   >
                     <div className="w-full h-full">
                       <video
-                        // ref={videoRef}
+                        ref={videoRef}
                         autoPlay
                         playsInline
                         muted
-                        className="h-full w-full object-cover sm:object-contain"
+                        className={cn(
+                          "h-full w-full object-cover sm:object-contain",
+                          shouldMirror ? "scale-x-[-1]" : "",
+                        )}
                       />
+                      {/* error overlay layout */}
+                      {permissionState === STATE.REQUESTING && (
+                        <Overlay text="Requesting camera access…" />
+                      )}
+                      {isSwitching && permissionState === STATE.READY && (
+                        <Overlay text="Switching device…" subtle />
+                      )}
+                      {permissionState === STATE.DENIED && (
+                        <Overlay text={errorMessage} tone="error" />
+                      )}
+                      {permissionState === STATE.NO_DEVICE && (
+                        <Overlay text={errorMessage} tone="error" />
+                      )}
+                      {permissionState === STATE.ERROR && (
+                        <Overlay text={errorMessage} tone="error" />
+                      )}
+
+                      {/* master overlay */}
+                      <div className="absolute inset-0 flex flex-col pointer-events-none">
+                        {/* ---- RIGHT ICON RAIL ---- */}
+                        <div className="absolute right-4 top-4 flex flex-col gap-4 pointer-events-auto">
+                          {true && (
+                            <button
+                              onClick={handleToggleCamera}
+                              className="cursor-pointer bg-black/50 flex items-center justify-center text-white pointer-events-auto px-3 py-1 rounded-2xl"
+                            >
+                              {isFlipping ? "Flipping.." : "Flip Camera"}
+                            </button>
+                          )}
+                        </div>
+
+                        {/* ---- BOTTOM STACK ---- */}
+                        <div className="flex flex-col justify-center items-center gap-2 p-3 absolute inset-x-0 bottom-0 pointer-events-auto">
+                          {!isMobile && (
+                            <div className="w-full max-w-sm grid grid-cols-2 gap-3 text-left bg-black p-3 rounded-xl border border-zinc-800/80 shrink-0">
+                              <label className="flex flex-col gap-1 text-xs font-medium text-zinc-400">
+                                Camera
+                                <select
+                                  onChange={onSelectVideo}
+                                  value={selectedVideoId}
+                                  className="rounded-lg bg-zinc-900 border border-zinc-700 px-2.5 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                  {videoDevices.map((d) => (
+                                    <option key={d.deviceId} value={d.deviceId}>
+                                      {d.label ||
+                                        `Camera ${d.deviceId.slice(0, 6)}`}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+
+                              <label className="flex flex-col gap-1 text-xs font-medium text-zinc-400">
+                                Microphone
+                                <select
+                                  value={selectedAudioId}
+                                  onChange={onSelectAudio}
+                                  className="rounded-lg bg-zinc-900 border border-zinc-700 px-2.5 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                  {audioDevices.map((d) => (
+                                    <option key={d.deviceId} value={d.deviceId}>
+                                      {d.label ||
+                                        `Mic ${d.deviceId.slice(0, 6)}`}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                            </div>
+                          )}
+                          <Button
+                            disabled={loading}
+                            onClick={handleGoLiveClick}
+                            className="w-full max-w-sm py-2.5 rounded-xl bg-blue-400 text-zinc-950 font-bold disabled:opacity-50 shrink-0 cursor-pointer"
+                            type="button"
+                          >
+                            Go Live
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
