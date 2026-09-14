@@ -294,7 +294,7 @@ export default function Preview({
                       <div className="absolute inset-0 flex flex-col pointer-events-none">
                         {/* ---- RIGHT ICON RAIL ---- */}
                         <div className="absolute right-4 top-4 flex flex-col gap-4 pointer-events-auto">
-                          {true && (
+                          {isMobile && (
                             <button
                               onClick={handleToggleCamera}
                               className="cursor-pointer bg-black/50 flex items-center justify-center text-white pointer-events-auto px-3 py-1 rounded-2xl"
@@ -307,8 +307,8 @@ export default function Preview({
                         {/* ---- BOTTOM STACK ---- */}
                         <div className="flex flex-col justify-center items-center gap-2 p-3 absolute inset-x-0 bottom-0 pointer-events-auto">
                           {!isMobile && (
-                            <div className="w-full max-w-sm grid grid-cols-2 gap-3 text-left bg-black p-3 rounded-xl border border-zinc-800/80 shrink-0">
-                              <label className="flex flex-col gap-1 text-xs font-medium text-zinc-400">
+                            <div className="w-full max-w-sm grid grid-cols-2 gap-3 text-left bg-black/40 p-3 rounded-xl border border-zinc-600/80 shrink-0">
+                              <label className="flex flex-col gap-1 text-xs font-medium text-zinc-300">
                                 Camera
                                 <select
                                   onChange={onSelectVideo}
@@ -324,7 +324,7 @@ export default function Preview({
                                 </select>
                               </label>
 
-                              <label className="flex flex-col gap-1 text-xs font-medium text-zinc-400">
+                              <label className="flex flex-col gap-1 text-xs font-medium text-zinc-300">
                                 Microphone
                                 <select
                                   value={selectedAudioId}
@@ -344,7 +344,7 @@ export default function Preview({
                           <Button
                             disabled={loading}
                             onClick={handleGoLiveClick}
-                            className="w-full max-w-sm py-2.5 rounded-xl bg-blue-400 text-zinc-950 font-bold disabled:opacity-50 shrink-0 cursor-pointer"
+                            className="w-full max-w-sm py-4 rounded-xl bg-blue-400 text-zinc-950 font-bold disabled:opacity-50 shrink-0 cursor-pointer hover:bg-blue-400/65 text-[16px]"
                             type="button"
                           >
                             Go Live
