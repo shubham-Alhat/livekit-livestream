@@ -210,7 +210,7 @@ export default function Preview({
       streamRef.current = null;
     }
 
-    // await onGoLive();
+    await onGoLive();
     setLoading(false);
   };
 

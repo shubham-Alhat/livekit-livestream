@@ -141,3 +141,21 @@
 .shine-sweep {
   animation: shine-sweep 4s ease-in-out infinite;
 }
+
+/* livekit livestreaming seller code */
+/* base */
+.lk-participant-media-video {
+  object-fit: cover;
+}
+
+/* match/beat LiveKit's own attribute-selector specificity */
+.lk-participant-media-video[data-lk-orientation] {
+  object-fit: cover;
+}
+
+@media (min-width: 640px) {
+  .lk-participant-media-video,
+  .lk-participant-media-video[data-lk-orientation] {
+    object-fit: contain !important;
+  }
+}
