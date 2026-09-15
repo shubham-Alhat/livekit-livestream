@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LiveKitRoom,
   VideoConference,
@@ -29,6 +29,7 @@ import {
 import { Button } from "./ui/button";
 import Image from "next/image";
 import { Track } from "livekit-client";
+import { cn } from "@/lib/utils";
 
 type SavedDevice = { showId: string; deviceId: string };
 
@@ -85,6 +86,18 @@ export default function LiveDashboardPage({
     });
   }, []);
 
+  const audioConfig = useMemo(() => {
+    return deviceConfig.audioId && !isMobile
+      ? { deviceId: deviceConfig.audioId }
+      : true;
+  }, []);
+
+  const videoConfig = useMemo(() => {
+    return deviceConfig.videoId && !isMobile
+      ? { deviceId: deviceConfig.videoId }
+      : true;
+  }, []);
+
   if (!deviceConfig.isLoaded) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -96,16 +109,8 @@ export default function LiveDashboardPage({
   return (
     <div>
       <LiveKitRoom
-        video={
-          deviceConfig.videoId && !isMobile
-            ? { deviceId: deviceConfig.videoId }
-            : true
-        }
-        audio={
-          deviceConfig.audioId && !isMobile
-            ? { deviceId: deviceConfig.audioId }
-            : true
-        }
+        video={videoConfig}
+        audio={audioConfig}
         token={token}
         onMediaDeviceFailure={(failure) => {
           console.log("Device failed to load:", failure);
@@ -201,7 +206,10 @@ function SellerStreamView() {
                       {localCameraTrack && isCameraEnabled ? (
                         <VideoTrack
                           trackRef={localCameraTrack}
-                          className="h-full w-full object-cover sm:object-contain!"
+                          className={cn(
+                            "h-full w-full object-cover sm:object-contain!",
+                            shouldMirror ? "scale-x-[-1]" : "",
+                          )}
                         />
                       ) : (
                         <div className="w-full h-full bg-black flex justify-center items-center">
