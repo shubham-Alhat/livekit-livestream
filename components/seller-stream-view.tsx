@@ -139,7 +139,7 @@ export default function SellerStreamView({
                         <VideoTrack
                           trackRef={localCameraTrack}
                           className={cn(
-                            "h-full w-full object-cover sm:object-contain",
+                            "h-full! w-full! object-cover! sm:object-contain!",
                             facing === "user" ? "scale-x-[-1]" : "",
                           )}
                         />
