@@ -136,6 +136,10 @@ export default function SellerStreamView({
                   >
                     <div className={"h-full w-full"}>
                       {localCameraTrack && isCameraEnabled ? (
+                        // also make sure in app/layout.tsx, global.css is imported
+                        // at last and @livekit/components-styles at very top, first (before global.css).
+                        // this will make tailwindcss global.css win!!
+                        // make sure you do this in production
                         <VideoTrack
                           trackRef={localCameraTrack}
                           className={cn(
