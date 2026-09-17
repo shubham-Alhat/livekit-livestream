@@ -65,3 +65,25 @@ export async function goLive(showId: string) {
     };
   }
 }
+
+export async function getAllLiveAuctions() {
+  try {
+    const liveShows = await prisma.show.findMany({
+      where: {
+        status: "LIVE",
+      },
+    });
+
+    return {
+      success: true,
+      message: "All auctions fetched successfully",
+      data: liveShows,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      message: "Error while fetching live auctions",
+    };
+  }
+}

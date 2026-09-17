@@ -191,7 +191,7 @@ export default function SellerStreamView({
                                 <Button
                                   onClick={() => console.log("follow btn")}
                                   size="sm"
-                                  className="h-6 rounded-full bg-yellow-400 hover:bg-yellow-500 text-black text-xs font-semibold px-3"
+                                  className="h-6 rounded-full bg-blue-400 hover:bg-blue-500 text-black text-xs font-semibold px-3"
                                 >
                                   Follow
                                 </Button>

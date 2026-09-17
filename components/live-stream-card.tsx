@@ -4,7 +4,16 @@ import Image from "next/image";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
-export const LivestreamCard = () => {
+interface SHOW {
+  id: string;
+  showName: string;
+  streamerId: string;
+  status: "LIVE" | "SCHEDULED" | "ENDED";
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export const LivestreamCard = ({ show }: { show: SHOW }) => {
   return (
     <>
       <Link href={`/home/live/`}>

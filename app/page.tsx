@@ -1,3 +1,4 @@
+import { getAllLiveAuctions } from "@/actions/show";
 import { LivestreamCard } from "@/components/live-stream-card";
 import { LoginForm } from "@/components/login-page";
 import { Navbar } from "@/components/navbar";
@@ -5,6 +6,7 @@ import { getSession } from "@/lib/dal";
 
 export default async function Home() {
   const res = await getSession();
+  const liveAuctions = await getAllLiveAuctions();
 
   return (
     <>
@@ -23,13 +25,35 @@ export default async function Home() {
             </div>
 
             {/* Grid of Auction Cards */}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              <LivestreamCard key={crypto.randomUUID()} />
-            </div>
+            {!liveAuctions.success ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <p className="text-lg font-medium text-foreground">
+                  Something went wrong
+                </p>
+                <p className="text-muted-foreground mt-1">
+                  {liveAuctions.message}
+                </p>
+              </div>
+            ) : liveAuctions && liveAuctions.data?.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <p className="text-lg font-medium text-foreground">
+                  No live auctions right now
+                </p>
+                <p className="text-muted-foreground mt-1">
+                  Check back later or explore past auctions.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {liveAuctions.data &&
+                  liveAuctions.data.map((show) => (
+                    <LivestreamCard key={show.id} show={show} />
+                  ))}
+              </div>
+            )}
           </main>
         </div>
-        {/* login pop up */}
+
         {!res && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <div className="w-full max-w-md mx-4">
