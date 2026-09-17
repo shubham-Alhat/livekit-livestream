@@ -89,68 +89,6 @@ export default function Preview({
     }
   };
 
-  // enumerate devices
-  const enumerate = useCallback(async () => {
-    console.log("enumerate devices function get called..", Date.now());
-    const all = await navigator.mediaDevices.enumerateDevices();
-    const cams = all.filter((d) => d.kind === "videoinput");
-    const mics = all.filter((d) => d.kind === "audioinput");
-    setVideoDevices(cams);
-    setAudioDevices(mics);
-    return { cams, mics };
-  }, []);
-
-  const onSelectVideo = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const id = e.target.value;
-    console.log(id);
-    setSelectedVideoId(id);
-    stopStream(streamRef.current);
-    try {
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: id } },
-        audio: selectedAudioId
-          ? { deviceId: { exact: selectedAudioId } }
-          : true,
-      });
-
-      attachStream(newStream);
-      localStorage.setItem(
-        "videoDeviceId",
-        JSON.stringify({ showId: showId, deviceId: id }),
-      );
-
-      const videoTrack = newStream.getVideoTracks()[0];
-      const { width, height } = videoTrack.getSettings();
-    } catch (error) {
-      console.log(error);
-      handleGetUserMediaError(error);
-    }
-  };
-
-  const onSelectAudio = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const id = e.target.value;
-    console.log(id);
-    setSelectedAudioId(id);
-    stopStream(streamRef.current);
-    try {
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        video: selectedVideoId
-          ? { deviceId: { exact: selectedVideoId } }
-          : true,
-        audio: { deviceId: { exact: id } },
-      });
-
-      attachStream(newStream);
-      localStorage.setItem(
-        "audioDeviceId",
-        JSON.stringify({ showId: showId, deviceId: id }),
-      );
-    } catch (error) {
-      console.log(error);
-      handleGetUserMediaError(error);
-    }
-  };
-
   // initial camera & audio access and listing devices options
   useEffect(() => {
     let ignore = false;
@@ -179,9 +117,6 @@ export default function Preview({
           initialStream.getTracks().map((t) => `${t.kind}:${t.id}`),
         );
         setPermissionState(STATE.READY);
-
-        // emurateDevice Only for laptop/pc
-        if (!isMobile) await enumerate();
       } catch (error) {
         console.log(error);
         if (!ignore) handleGetUserMediaError(error);
@@ -306,45 +241,10 @@ export default function Preview({
 
                         {/* ---- BOTTOM STACK ---- */}
                         <div className="flex flex-col justify-center items-center gap-2 p-3 absolute inset-x-0 bottom-0 pointer-events-auto">
-                          {!isMobile && (
-                            <div className="w-full max-w-sm grid grid-cols-2 gap-3 text-left bg-black/40 p-3 rounded-xl border border-zinc-600/80 shrink-0">
-                              <label className="flex flex-col gap-1 text-xs font-medium text-zinc-300">
-                                Camera
-                                <select
-                                  onChange={onSelectVideo}
-                                  value={selectedVideoId}
-                                  className="rounded-lg bg-zinc-900 border border-zinc-700 px-2.5 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                  {videoDevices.map((d) => (
-                                    <option key={d.deviceId} value={d.deviceId}>
-                                      {d.label ||
-                                        `Camera ${d.deviceId.slice(0, 6)}`}
-                                    </option>
-                                  ))}
-                                </select>
-                              </label>
-
-                              <label className="flex flex-col gap-1 text-xs font-medium text-zinc-300">
-                                Microphone
-                                <select
-                                  value={selectedAudioId}
-                                  onChange={onSelectAudio}
-                                  className="rounded-lg bg-zinc-900 border border-zinc-700 px-2.5 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                  {audioDevices.map((d) => (
-                                    <option key={d.deviceId} value={d.deviceId}>
-                                      {d.label ||
-                                        `Mic ${d.deviceId.slice(0, 6)}`}
-                                    </option>
-                                  ))}
-                                </select>
-                              </label>
-                            </div>
-                          )}
                           <Button
                             disabled={loading}
                             onClick={handleGoLiveClick}
-                            className="w-full max-w-sm py-4 rounded-xl bg-blue-400 text-zinc-950 font-bold disabled:opacity-50 shrink-0 cursor-pointer hover:bg-blue-400/65 text-[16px]"
+                            className="w-full max-w-[150px] py-4 rounded-xl bg-blue-400 text-zinc-950 font-bold disabled:opacity-50 shrink-0 cursor-pointer hover:bg-blue-400/65 text-[16px]"
                             type="button"
                           >
                             Go Live
