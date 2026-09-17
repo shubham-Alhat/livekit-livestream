@@ -54,6 +54,7 @@ export default function SellerStreamView({
   token: string;
 }) {
   const [loading, setLoading] = useState<boolean>(false);
+  const [facing, setFacing] = useState<"user" | "environment">("user");
   const participants = useParticipants();
 
   const { localParticipant, isCameraEnabled, isMicrophoneEnabled } =
@@ -97,7 +98,18 @@ export default function SellerStreamView({
     setLoading(false);
   };
 
-  const handleToggleFacingMode = () => {};
+  const handleFlipCamera = async () => {
+    setLoading(true);
+    const pub = localParticipant.getTrackPublication(Track.Source.Camera);
+    if (!pub?.videoTrack) {
+      setLoading(false);
+      return;
+    }
+    const next = facing === "user" ? "environment" : "user";
+    await pub.videoTrack.restartTrack({ facingMode: next });
+    setFacing(next);
+    setLoading(false);
+  };
 
   return (
     <>
@@ -122,13 +134,13 @@ export default function SellerStreamView({
                       backgroundColor: "rgb(0,0,0)",
                     }}
                   >
-                    <div className="w-full h-full">
+                    <div className={"h-full w-full"}>
                       {localCameraTrack && isCameraEnabled ? (
                         <VideoTrack
                           trackRef={localCameraTrack}
                           className={cn(
-                            "h-full w-full object-cover sm:object-contain!",
-                            // shouldMirror ? "scale-x-[-1]" : "",
+                            "h-full w-full object-cover sm:object-contain",
+                            facing === "user" ? "scale-x-[-1]" : "",
                           )}
                         />
                       ) : (
@@ -232,7 +244,7 @@ export default function SellerStreamView({
                           {isMobile && (
                             <button
                               disabled={loading}
-                              onClick={toggleCam}
+                              onClick={handleFlipCamera}
                               className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
                             >
                               <SwitchCamera className="size-5" />

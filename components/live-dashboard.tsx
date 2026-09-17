@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
 
 import "@livekit/components-styles";
 import SellerStreamView from "./seller-stream-view";
-
-type SavedDevice = { showId: string; deviceId: string };
 
 export default function LiveDashboardPage({
   showId,
@@ -21,6 +18,11 @@ export default function LiveDashboardPage({
     <div>
       <LiveKitRoom
         video={true}
+        options={{
+          videoCaptureDefaults: {
+            facingMode: "user",
+          },
+        }}
         audio={true}
         token={token}
         onMediaDeviceFailure={(failure) => {
