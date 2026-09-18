@@ -4,10 +4,12 @@ import { Button } from "./ui/button";
 
 import {
   Gift,
+  MicOff,
   ShareIcon,
   Star,
   SwitchCamera,
   VideoIcon,
+  VideoOff,
   VideoOffIcon,
   WalletIcon,
 } from "lucide-react";
@@ -17,6 +19,7 @@ import { Volume2 } from "lucide-react";
 import { VolumeX } from "lucide-react";
 import {
   isTrackReference,
+  RoomAudioRenderer,
   useLocalParticipant,
   useParticipants,
   useTracks,
@@ -44,76 +47,40 @@ const messages = [
   { id: "15", text: "Thanks for the great deal 🙌", user: "deal_hunter" },
 ];
 
-export default function ViewerStreamPage({
-  showId,
-  isMobile,
-  token,
-}: {
-  showId: string;
-  isMobile: boolean;
-  token: string;
-}) {
+export default function ViewerStreamPage() {
   const [loading, setLoading] = useState<boolean>(false);
-  const [facing, setFacing] = useState<"user" | "environment">("user");
+  const [isLocalAudioMuted, setIsLocalAudioMuted] = useState<boolean>(false);
   const participants = useParticipants();
 
-  const { localParticipant, isCameraEnabled, isMicrophoneEnabled } =
-    useLocalParticipant();
+  const { localParticipant } = useLocalParticipant();
 
-  // Get seller's local camera track reference
+  // Fetch remote camera and mic tracks published by the seller
   const tracks = useTracks([
     { source: Track.Source.Camera, withPlaceholder: true },
+    { source: Track.Source.Microphone, withPlaceholder: true },
   ]);
-  const localCameraTrackRef = tracks.find(
-    (trackRef) => trackRef.participant.identity === localParticipant.identity,
-  );
 
-  // to remove type error typeRef of VideoTrack
-  const localCameraTrack =
-    localCameraTrackRef && isTrackReference(localCameraTrackRef)
-      ? localCameraTrackRef
-      : undefined;
+  // here we are just finding the publishing tracks in room and grabing that.
+  // here we need to also grab the seller tracks using ... && t.sellerId === sellerId
+  const cameraTrackRef = tracks.find((t) => t.source === Track.Source.Camera);
+  const micTrackRef = tracks.find((t) => t.source === Track.Source.Microphone);
 
-  // toggleMic
-  const toggleMic = async () => {
-    setLoading(true);
-    const next = !isMicrophoneEnabled;
+  // Detect if seller has muted camera or mic
+  const isCameraMuted =
+    !cameraTrackRef ||
+    !isTrackReference(cameraTrackRef) ||
+    Boolean(cameraTrackRef.publication?.isMuted);
 
-    if (next) {
-      await localParticipant.setMicrophoneEnabled(true); // republish the tracks
-      setLoading(false);
-    } else {
-      await localParticipant.setMicrophoneEnabled(false);
-      const pub = localParticipant.getTrackPublication(Track.Source.Microphone);
-      if (pub?.track) {
-        await localParticipant.unpublishTrack(pub.track, true); // stop + unpublish
-      }
-      setLoading(false);
-    }
-  };
-
-  const toggleCam = async () => {
-    setLoading(true);
-    await localParticipant.setCameraEnabled(!isCameraEnabled);
-    setLoading(false);
-  };
-
-  const handleFlipCamera = async () => {
-    setLoading(true);
-    const pub = localParticipant.getTrackPublication(Track.Source.Camera);
-    if (!pub?.videoTrack) {
-      setLoading(false);
-      return;
-    }
-    const next = facing === "user" ? "environment" : "user";
-    await pub.videoTrack.restartTrack({ facingMode: next });
-    setFacing(next);
-    setLoading(false);
-  };
+  const isMicMuted =
+    !micTrackRef ||
+    !isTrackReference(micTrackRef) ||
+    Boolean(micTrackRef.publication?.isMuted);
 
   return (
     <>
       <div>
+        {/* 1. Renders seller audio; setting muted={true} silences it locally for this viewer */}
+        <RoomAudioRenderer muted={isLocalAudioMuted} />
         <header className="w-full h-[62px] justify-center items-center bg-black text-blue-200 hidden lg:flex sticky top-0 z-50">
           <nav>WELCOME TO KICK</nav>
         </header>
@@ -135,23 +102,31 @@ export default function ViewerStreamPage({
                     }}
                   >
                     <div className={"h-full w-full"}>
-                      {localCameraTrack && isCameraEnabled ? (
+                      {cameraTrackRef &&
+                      isTrackReference(cameraTrackRef) &&
+                      !isCameraMuted ? (
                         // also make sure in app/layout.tsx, global.css is imported
                         // at last and @livekit/components-styles at very top, first (before global.css).
                         // this will make tailwindcss global.css win!!
                         // make sure you do this in production
                         <VideoTrack
-                          trackRef={localCameraTrack}
-                          className={cn(
-                            "h-full! w-full! object-cover! sm:object-contain!",
-                            facing === "user" ? "scale-x-[-1]" : "",
-                          )}
+                          trackRef={cameraTrackRef}
+                          className="h-full! w-full! object-cover! sm:object-contain!"
                         />
                       ) : (
-                        <div className="w-full h-full bg-black flex justify-center items-center">
-                          <p className="text-[16px] text-blue-200">
-                            Camera is switched off
+                        <div className="flex flex-col items-center justify-center gap-2 text-slate-400 bg-black/55 backdrop-blur-2xl">
+                          <VideoOff className="size-10" />
+                          <p className="text-sm font-medium">
+                            Seller's camera is off
                           </p>
+                        </div>
+                      )}
+
+                      {/* 3. Seller Microphone Status Overlay */}
+                      {isMicMuted && (
+                        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 text-white text-xs font-medium border border-white/10 z-10">
+                          <MicOff className="size-3.5 text-red-400" />
+                          <span>Seller is muted</span>
                         </div>
                       )}
 
@@ -245,35 +220,26 @@ export default function ViewerStreamPage({
 
                         {/* ---- RIGHT ICON RAIL ---- */}
                         <div className="absolute right-3 top-1/3 flex flex-col gap-4 pointer-events-auto">
-                          {isMobile && (
-                            <button
-                              disabled={loading}
-                              onClick={handleFlipCamera}
-                              className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
-                            >
-                              <SwitchCamera className="size-5" />
-                            </button>
-                          )}
                           <button
-                            disabled={loading}
-                            onClick={toggleCam}
-                            className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
-                          >
-                            {isCameraEnabled ? (
-                              <VideoIcon className="size-5" />
-                            ) : (
-                              <VideoOffIcon className="size-5" />
+                            onClick={() =>
+                              setIsLocalAudioMuted((prev) => !prev)
+                            }
+                            className={cn(
+                              "size-10 cursor-pointer rounded-full flex items-center justify-center text-white transition-colors",
+                              isLocalAudioMuted
+                                ? "bg-red-500/80 hover:bg-red-600"
+                                : "bg-black/50 hover:bg-black/70",
                             )}
-                          </button>
-                          <button
-                            disabled={loading}
-                            onClick={toggleMic}
-                            className="size-9 cursor-pointer rounded-full bg-black/50 flex items-center justify-center text-white pointer-events-auto"
+                            title={
+                              isLocalAudioMuted
+                                ? "Unmute seller sound"
+                                : "Mute seller sound"
+                            }
                           >
-                            {isMicrophoneEnabled ? (
-                              <Volume2 className="size-5" />
-                            ) : (
+                            {isLocalAudioMuted ? (
                               <VolumeX className="size-5" />
+                            ) : (
+                              <Volume2 className="size-5" />
                             )}
                           </button>
                           <button

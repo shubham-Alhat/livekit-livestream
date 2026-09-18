@@ -34,7 +34,7 @@ export default function LiveDashboardPage({
       >
         {/* our custom compoenent */}
         <SellerStreamView isMobile={isMobile} showId={showId} token={token} />
-        <RoomAudioRenderer />
+        {/* <RoomAudioRenderer /> */}
         {/* <RoomAudioRenderer> is solely responsible for playing the audio of other people in the room. */}
         {/* ever plan to allow "co-hosts" to join the stream, or want to let a buyer join with their microphone to ask a question, the seller will not be able to hear them unless <RoomAudioRenderer> is there. */}
       </LiveKitRoom>
