@@ -16,7 +16,7 @@ interface SHOW {
 export const LivestreamCard = ({ show }: { show: SHOW }) => {
   return (
     <>
-      <Link href={`/home/live/`}>
+      <Link href={`/live/${show.id}`}>
         <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer bg-card border-border">
           {/* Image Container */}
           <div className="relative overflow-hidden bg-muted h-48">
@@ -52,7 +52,7 @@ export const LivestreamCard = ({ show }: { show: SHOW }) => {
 
             {/* Title */}
             <h3 className="font-semibold text-foreground line-clamp-2">
-              shubham live streaming..
+              {show.showName}
             </h3>
 
             {/* Bid Info */}
