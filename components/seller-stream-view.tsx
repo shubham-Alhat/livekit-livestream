@@ -99,6 +99,7 @@ export default function SellerStreamView({
   };
 
   const handleFlipCamera = async () => {
+    if (!isCameraEnabled) return;
     setLoading(true);
     const pub = localParticipant.getTrackPublication(Track.Source.Camera);
     if (!pub?.videoTrack) {
