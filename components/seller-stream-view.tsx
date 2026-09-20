@@ -28,20 +28,6 @@ import { useState } from "react";
 
 const messages = [
   { id: "01", text: "Hello world by whatnot", user: "Whatnot_user" },
-  { id: "02", text: "This item looks amazing!", user: "collector_23" },
-  { id: "03", text: "Is shipping included?", user: "buyer_mike" },
-  { id: "04", text: "Placing my bid now 🔥", user: "Whatnot_user" },
-  { id: "05", text: "How many left in stock?", user: "sarah_j" },
-  { id: "06", text: "First time here, loving the vibe", user: "newbie99" },
-  { id: "07", text: "Can you show the back side?", user: "collector_23" },
-  { id: "08", text: "That price is a steal", user: "deal_hunter" },
-  { id: "09", text: "GG well played everyone", user: "buyer_mike" },
-  { id: "10", text: "Adding to cart right away", user: "sarah_j" },
-  { id: "11", text: "Does this ship internationally?", user: "eu_buyer_88" },
-  { id: "12", text: "Loving this stream today", user: "Whatnot_user" },
-  { id: "13", text: "Next item please!", user: "newbie99" },
-  { id: "14", text: "Condition looks mint", user: "collector_23" },
-  { id: "15", text: "Thanks for the great deal 🙌", user: "deal_hunter" },
 ];
 
 export default function SellerStreamView({
