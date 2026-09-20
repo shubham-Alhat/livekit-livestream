@@ -10,6 +10,11 @@ export default function ViewerLiveStage({ token }: { token: string }) {
         <LiveKitRoom
           video={false}
           audio={false}
+          options={{
+            adaptiveStream: {
+              pixelDensity: "screen",
+            },
+          }}
           token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
           connect={true}

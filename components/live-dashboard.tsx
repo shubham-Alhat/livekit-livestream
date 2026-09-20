@@ -4,6 +4,7 @@ import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
 
 import "@livekit/components-styles";
 import SellerStreamView from "./seller-stream-view";
+import { VideoPresets } from "livekit-client";
 
 export default function LiveDashboardPage({
   showId,
@@ -19,8 +20,15 @@ export default function LiveDashboardPage({
       <LiveKitRoom
         video={true}
         options={{
+          dynacast: true,
           videoCaptureDefaults: {
             facingMode: "user",
+            resolution: VideoPresets.h1080.resolution,
+          },
+          publishDefaults: {
+            simulcast: true,
+            videoCodec: "h264",
+            videoSimulcastLayers: [VideoPresets.h360, VideoPresets.h720],
           },
         }}
         audio={true}
