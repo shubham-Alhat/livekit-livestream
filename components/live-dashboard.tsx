@@ -15,8 +15,8 @@ const sellerOptions: RoomOptions = {
   publishDefaults: {
     simulcast: true,
     videoCodec: "h264",
-    videoSimulcastLayers: [VideoPresets.h360, VideoPresets.h720],
-    degradationPreference: "maintain-resolution", // it is optional
+    videoSimulcastLayers: [VideoPresets.h540, VideoPresets.h720],
+    degradationPreference: "maintain-resolution",
   },
 };
 
