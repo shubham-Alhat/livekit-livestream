@@ -15,6 +15,10 @@ const sellerOptions: RoomOptions = {
   publishDefaults: {
     simulcast: true,
     videoCodec: "h264",
+    videoEncoding: {
+      maxBitrate: 4_500_000,
+      maxFramerate: 30,
+    },
     videoSimulcastLayers: [VideoPresets.h540, VideoPresets.h720],
     degradationPreference: "maintain-resolution",
   },
