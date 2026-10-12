@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import DateTimePicker from "./date-time-picker";
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState("");
   const router = useRouter();
+
+  const [startsAt, setStartsAt] = useState<Date | null>(null);
 
   const handleCreateStream = async () => {
     if (description.trim() === "") {
@@ -51,23 +52,18 @@ export default function DashboardPage() {
     }
   };
 
+  // for debugging purpose
+  useEffect(() => {
+    console.log(
+      `${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} :: startsAt = ${startsAt}`,
+    );
+  }, [startsAt]);
+
   return (
     <>
       <div className="w-full h-screen flex justify-center items-center">
         <div className="w-[300px]">
-          <Input
-            type="text"
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Enter text"
-          />
-          <p className="text-sm mt-0.5">Give your auction description</p>
-          <Button
-            disabled={loading}
-            onClick={handleCreateStream}
-            className="cursor-pointer mt-1.5"
-          >
-            Create stream
-          </Button>
+          <DateTimePicker value={startsAt} onChange={setStartsAt} />
         </div>
       </div>
     </>
