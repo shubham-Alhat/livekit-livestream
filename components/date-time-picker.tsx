@@ -34,6 +34,11 @@ const dateFormatter = new Intl.DateTimeFormat("en-IN", {
   minute: "2-digit",
 });
 
+export const getMinDate = () => {
+  const now = new Date();
+  return now;
+};
+
 const startOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth(), 1);
 
 const sameDay = (a: Date, b: Date) =>
@@ -41,13 +46,11 @@ const sameDay = (a: Date, b: Date) =>
   a.getMonth() === b.getMonth() &&
   a.getDate() === b.getDate();
 
-/** Round up to the next whole minute, seconds zeroed. */
-function ceilToMinute(d: Date) {
-  const out = new Date(d);
-  if (out.getSeconds() || out.getMilliseconds())
-    out.setMinutes(out.getMinutes() + 1);
-  out.setSeconds(0, 0);
-  return out;
+/** Fallback start: now + 5 minutes, seconds and ms zeroed */
+function getSafeStart() {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() + 5, 0, 0);
+  return d;
 }
 
 /** Next full hour from now */
@@ -87,7 +90,7 @@ export default function DateTimePicker({ value, onChange }: Props) {
     console.log("commit runs here");
     const d = new Date(next);
     d.setSeconds(0, 0);
-    onChange(minDate && d < minDate ? ceilToMinute(minDate) : d);
+    onChange(d < getMinDate() ? getSafeStart() : d);
   };
 
   const setTime = (parts: {
@@ -106,7 +109,7 @@ export default function DateTimePicker({ value, onChange }: Props) {
 
   const setDay = (day: number) => {
     if (!viewDate) return;
-    const base = value ?? defaultStart(minDate);
+    const base = value ?? defaultStart();
     commit(
       new Date(
         viewDate.getFullYear(),
@@ -170,10 +173,9 @@ export default function DateTimePicker({ value, onChange }: Props) {
       ]
     : [];
 
-  const canGoPrev = !minDate || !viewDate || startOfMonth(viewDate) > minDate;
+  const canGoPrev = !viewDate || startOfMonth(viewDate) > getMinDate();
 
   const isDayDisabled = (day: number) =>
-    !!minDate &&
     !!viewDate &&
     new Date(
       viewDate.getFullYear(),
@@ -183,7 +185,7 @@ export default function DateTimePicker({ value, onChange }: Props) {
       59,
       59,
       999,
-    ) < minDate;
+    ) < getMinDate();
 
   return (
     <div
