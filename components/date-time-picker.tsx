@@ -189,7 +189,7 @@ export default function DateTimePicker({ value, onChange }: Props) {
 
   return (
     <div
-      className={`rounded-xl bg-card p-2 text-card-foreground transition-shadow duration-300 sm:p-3.5 ${
+      className={`rounded-xl bg-card py-2 text-card-foreground transition-shadow duration-300 sm:py-3.5 ${
         open ? "shadow-2xl shadow-black/20" : ""
       }`}
     >
@@ -197,7 +197,7 @@ export default function DateTimePicker({ value, onChange }: Props) {
         type="button"
         onClick={toggle}
         aria-expanded={open}
-        className="flex min-h-12 w-full touch-manipulation items-center justify-between gap-3 rounded-xl px-2 text-left outline-none transition hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+        className="flex min-h-12 w-full touch-manipulation items-center justify-between gap-3 rounded-xl px-3 text-left outline-none transition hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
       >
         <span
           className={`text-primary font-medium tracking-tight ${
@@ -221,7 +221,7 @@ export default function DateTimePicker({ value, onChange }: Props) {
       >
         <div className="min-h-0 overflow-hidden">
           {viewDate && (
-            <div className="rounded-xl bg-background p-3 sm:p-4">
+            <div className="bg-background p-3 sm:p-4">
               {/* Month header */}
               <div className="mb-3 flex items-center justify-between sm:mb-4">
                 <h2 className="text-[16px] font-semibold tracking-tight sm:text-[22px]">
