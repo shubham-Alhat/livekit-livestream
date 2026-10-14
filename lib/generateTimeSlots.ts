@@ -1,57 +1,61 @@
+export type TimeSlot = {
+  /** Display text, e.g. "6:15 PM" */
+  label: string;
+  /** 24h hour, 0-23 (use this to build the Date, never parse `label`) */
+  hours: number;
+  /** 0-59 */
+  minutes: number;
+};
+
+const START_MINUTES = 18 * 60; // 6:00 PM
+const END_MINUTES = 22 * 60; // 10:00 PM (inclusive)
+
+const EMPTY_MESSAGE =
+  "No slots left for this date. Please select the next date.";
+
+function formatSlot(totalMinutes: number): TimeSlot {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const period = hours >= 12 ? "PM" : "AM";
+  const hour12 = hours % 12 || 12;
+  return {
+    label: `${hour12}:${String(minutes).padStart(2, "0")} ${period}`,
+    hours,
+    minutes,
+  };
+}
+
 /**
- Generates available 15-minute time slots between 6:00 PM and 10:00 PM in 12-hour format.
- 
+ * Evening slots (6:00 PM - 10:00 PM) for a given calendar day.
+ *
+ * - Works on minutes-since-midnight, so no Date mutation and no DST surprises.
+ * - For today, hides slots that start sooner than `leadMinutes` from now.
+ * - For a past day, returns no slots.
  */
 export function getEveningTimeSlots(
-  selectedDate: Date | string,
-  intervalMinutes: number = 15,
-): { slots: string[]; message?: string } {
-  const selected = new Date(selectedDate);
-  const now = new Date();
+  selectedDate: Date,
+  intervalMinutes = 15,
+  leadMinutes = 30,
+  now: Date = new Date(),
+): { slots: TimeSlot[]; message?: string } {
+  const dayStart = (d: Date) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 
-  // Check if the selected date is today
-  const isToday =
-    selected.getFullYear() === now.getFullYear() &&
-    selected.getMonth() === now.getMonth() &&
-    selected.getDate() === now.getDate();
+  const selectedStart = dayStart(selectedDate);
+  const todayStart = dayStart(now);
 
-  const slots = [];
-
-  // Range: 18:00 (6:00 PM) to 22:00 (10:00 PM)
-  const startHour = 18;
-  const endHour = 22;
-
-  let slotTime = new Date(selected);
-  slotTime.setHours(startHour, 0, 0, 0);
-
-  const endTime = new Date(selected);
-  endTime.setHours(endHour, 0, 0, 0);
-
-  while (slotTime <= endTime) {
-    if (!isToday || slotTime > now) {
-      let hours = slotTime.getHours();
-      const minutes = slotTime.getMinutes();
-
-      // Convert to 12-hour format
-      const ampm = hours >= 12 ? "PM" : "AM";
-      hours = hours % 12;
-      hours = hours ? hours : 12; // Handle hour '0' as '12'
-
-      const formattedHours = String(hours).padStart(2, "0");
-      const formattedMinutes = String(minutes).padStart(2, "0");
-
-      slots.push(`${formattedHours}:${formattedMinutes} ${ampm}`);
-    }
-
-    slotTime.setMinutes(slotTime.getMinutes() + intervalMinutes);
+  if (selectedStart < todayStart) {
+    return { slots: [], message: EMPTY_MESSAGE };
   }
 
-  if (slots.length === 0) {
-    return {
-      slots: [],
-      message: "No available slots for today. Please select the next date.",
-    };
+  const isToday = selectedStart === todayStart;
+  const earliest = now.getHours() * 60 + now.getMinutes() + leadMinutes;
+
+  const slots: TimeSlot[] = [];
+  for (let m = START_MINUTES; m <= END_MINUTES; m += intervalMinutes) {
+    if (isToday && m < earliest) continue;
+    slots.push(formatSlot(m));
   }
 
-  return { slots };
+  return slots.length === 0 ? { slots, message: EMPTY_MESSAGE } : { slots };
 }

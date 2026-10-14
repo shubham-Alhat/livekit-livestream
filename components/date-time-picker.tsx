@@ -1,13 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  CalendarDays,
-  CheckCheck,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-import { getEveningTimeSlots } from "@/lib/generateTimeSlots";
+import { CalendarDays, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import WheelPicker from "./wheel-picker";
 
 const MONTHS = [
   "January",
@@ -73,6 +68,7 @@ type Props = {
 
 export default function DateTimePicker({ value, onChange }: Props) {
   const [open, setOpen] = useState(false);
+  const [timeOpen, setTimeOpen] = useState(false);
   const [viewDate, setViewDate] = useState<Date | null>(
     value ? startOfMonth(value) : null,
   );
@@ -127,7 +123,7 @@ export default function DateTimePicker({ value, onChange }: Props) {
 
   const toggle = () => {
     if (open) {
-      // setTimeOpen(false);
+      setTimeOpen(false);
     } else {
       const base = value ?? defaultStart();
       if (!value) onChange(base);
@@ -193,7 +189,7 @@ export default function DateTimePicker({ value, onChange }: Props) {
 
   return (
     <div
-      className={`rounded-xl bg-card py-2 text-card-foreground transition-shadow duration-300 sm:py-3 ${
+      className={`rounded-xl bg-card py-2 text-card-foreground transition-shadow duration-300 sm:py-3.5 ${
         open ? "shadow-2xl shadow-black/20" : ""
       }`}
     >
@@ -201,7 +197,7 @@ export default function DateTimePicker({ value, onChange }: Props) {
         type="button"
         onClick={toggle}
         aria-expanded={open}
-        className="flex min-h-12 w-full touch-manipulation items-center justify-between gap-3 rounded-xl px-4 text-left outline-none transition focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+        className="flex min-h-12 w-full touch-manipulation items-center justify-between gap-3 rounded-xl px-3 text-left outline-none transition focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
       >
         <span
           className={`text-primary font-medium tracking-tight ${
@@ -302,17 +298,67 @@ export default function DateTimePicker({ value, onChange }: Props) {
               </div>
 
               {/* Time row */}
-              <div className="mt-4 border-t border-border px-1 pt-4 grid grid-cols-3 gap-y-2 gap-x-2">
-
-                
-                  
-                
+              <div className="mt-4 flex items-center justify-center border-t border-border px-1 pt-4">
+                {/* <span className="text-[10px] font-semibold">
+                  <Clock size={20} />
+                </span> */}
                 <button
                   type="button"
-                  className="touch-manipulation rounded-lg px-2 py-1.5 text-xl leading-none tabular-nums transition-colors bg-accent text-primary"
+                  onClick={() => setTimeOpen((o) => !o)}
+                  aria-expanded={timeOpen}
+                  className={`touch-manipulation rounded-lg px-2 py-1.5 text-xl leading-none tabular-nums transition-colors ${
+                    timeOpen
+                      ? "bg-accent text-primary"
+                      : "bg-muted text-foreground"
+                  }`}
                 >
-                  {hour12}:{pad(minute)}
-                </button>}
+                  {hour12}:{pad(minute)} {period}
+                </button>
+              </div>
+
+              {/* iOS-style wheels */}
+              <div
+                className={`grid transition-[grid-template-rows,opacity,visibility] duration-300 ease-out ${
+                  timeOpen
+                    ? "visible grid-rows-[1fr] opacity-100"
+                    : "invisible grid-rows-[0fr] opacity-0"
+                }`}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  <div className="relative mx-auto mt-3 flex w-full max-w-64 items-center gap-2 [mask-image:linear-gradient(to_bottom,transparent,black_28%,black_72%,transparent)]">
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-0 top-1/2 h-9 -translate-y-1/2 rounded-lg bg-muted"
+                    />
+                    <WheelPicker
+                      className="min-w-0 flex-1"
+                      label="Hour"
+                      values={HOURS}
+                      value={hour12 as (typeof HOURS)[number]}
+                      onChange={(h) => setTime({ hour12: h })}
+                      loop={true}
+                      syncWith={value}
+                    />
+                    <WheelPicker
+                      className="min-w-0 flex-1"
+                      label="Minutes"
+                      values={MINUTES}
+                      value={minute}
+                      format={pad}
+                      onChange={(m) => setTime({ minute: m })}
+                      loop={true}
+                      syncWith={value}
+                    />
+                    <WheelPicker
+                      className="min-w-0 flex-1"
+                      label="AM or PM"
+                      values={PERIODS}
+                      value={period}
+                      onChange={(p) => setTime({ period: p })}
+                      syncWith={value}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -322,10 +368,11 @@ export default function DateTimePicker({ value, onChange }: Props) {
               type="button"
               onClick={() => {
                 setOpen(false);
+                setTimeOpen(false);
               }}
               className="touch-manipulation rounded-lg px-3 py-2 text-base font-medium text-primary transition hover:bg-accent"
             >
-              <CheckCheck size={20} />
+              Done
             </button>
           </div>
         </div>
